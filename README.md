@@ -11,6 +11,13 @@ A browser must support HTML canvas to use this tool.
 
 There is an [online demo](http://kyamagu.github.io/js-segment-annotator/?view=index).
 
+Modifications
+-------------
+
+Run using "python -m SimpleHTTPServer"
+
+Making changes to the UI according to taste.
+
 Importing data
 --------------
 
