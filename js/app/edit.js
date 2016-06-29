@@ -56,19 +56,13 @@ function(Layer, Annotator, util) {
   }
 
   // Create the main content block.
-  function createMainDisplay(params, data, annotator, imageLayer) {
+  function createMainDisplay(params, data, annotator) {
     var container = document.createElement("div"),
-        imageContainerSpacer = document.createElement("div"),
-        imageContainer = document.createElement("div"),
         annotatorTopMenu = createImageTopMenu(params, data, annotator),
         annotatorContainer = document.createElement("div"),
         sidebarSpacer = document.createElement("div"),
         sidebarContainer = document.createElement("div"),
         sidebar = createSidebar(params, data, annotator);
-    imageContainerSpacer.className = "edit-image-top-menu";
-    imageContainer.className = "edit-image-display";
-    imageContainer.appendChild(imageContainerSpacer);
-    imageContainer.appendChild(imageLayer.canvas);
     annotatorContainer.className = "edit-image-display";
     annotatorContainer.appendChild(annotatorTopMenu);
     annotatorContainer.appendChild(annotator.container);
@@ -77,7 +71,6 @@ function(Layer, Annotator, util) {
     sidebarContainer.appendChild(sidebarSpacer);
     sidebarContainer.appendChild(sidebar);
     container.className = "edit-main-container";
-    container.appendChild(imageContainer);
     container.appendChild(annotatorContainer);
     container.appendChild(sidebarContainer);
     return container;
@@ -443,17 +436,11 @@ function(Layer, Annotator, util) {
             document.getElementById("label-" + label + "-button").click();
           },
           onmousemove: highlightLabel
-        }),
-        imageLayer = new Layer(data.imageURLs[id], {
-          width: params.width,
-          height: params.height
         });
     document.body.appendChild(createNavigationMenu(params, data, annotator));
-    document.body.appendChild(createMainDisplay(params,
-                                                data,
-                                                annotator,
-                                                imageLayer));
+    document.body.appendChild(createMainDisplay(params, data, annotator));
   }
 
   return render;
 });
+
