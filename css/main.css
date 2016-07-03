@@ -1,3 +1,12 @@
+html {
+  transform: scale(1.5);
+  transform-origin: top left;
+}
+
+body {
+  width: 1400px;
+}
+
 .segment-viewer-overlay-container {
   background-color: rgba(255, 255, 255, 0.5);
   color: black;
@@ -192,6 +201,7 @@
 }
 .edit-main-container {
   white-space: nowrap;
+  width: 1400px;
 }
 .edit-top-menu-block {
   display: inline-block;

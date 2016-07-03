@@ -3,10 +3,28 @@
 <head>
   <title>Adult Coloring Book</title>
   <link href="css/main.css" rel="stylesheet" type="text/css">
+  <script src="js/jquery.min.js"></script>
   <script data-main="js/main.js" src="js/require.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
 </head>
 <body>
+<div class="edit-main-container">
+
+<!-- left hand panel -->
+<div class="edit-image-display">
+<div id="lhp"></div>
+<button class="img-submit">submit</button>
+<div class="edit-image-instructions">color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span></div>
+</div>
+
+<!-- right hand panel -->
+<div class="edit-image-display" id="rhp">
+</div>
+
+</div>
 </body>
+<!--<head>
+  <script src="js/auth.js"></script>
+  <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
+</head>-->
 </html>
+

@@ -6,45 +6,29 @@ define(['../image/layer',
 function(Layer, Annotator, util) {
   // Create the main content block.
   function createMainDisplay(params, data, annotator) {
-    var container = document.createElement("div"),
-        annotatorTopMenu = createImageTopMenu(params, data, annotator),
-        annotatorContainer = document.createElement("div"),
-        sidebarSpacer = document.createElement("div"),
-        sidebarContainer = document.createElement("div"),
+    var annotatorTopMenu = createImageTopMenu(params, data, annotator),
         sidebar = createSidebar(params, data, annotator);
-    annotatorContainer.className = "edit-image-display";
-    sidebarSpacer.appendChild(annotatorTopMenu);
-    annotatorContainer.appendChild(annotator.container);
-    sidebarSpacer.className = "edit-image-top-menu";
-    sidebarContainer.className = "edit-image-display";
-    sidebarContainer.appendChild(sidebarSpacer);
+    
+    var sidebarContainer = $("#lhp")[0];
+    sidebarContainer.appendChild(annotatorTopMenu);
     sidebarContainer.appendChild(sidebar);
 
-    submitButton = document.createElement("button");
-    submitButton.className = "img-submit";
-    submitButton.onclick = function() {
+
+    // set up right panel
+    var annotatorContainer = $("#rhp")[0];
+    annotatorContainer.appendChild(annotator.container);
+
+    var container = $(".edit-main-container")[0];
+
+
+    $(".img-submit").click(function() {
       var data = annotator.export();
       //console.log(data);
       window.open(data);
-    };
-    submitButton.innerHTML = "submit";
+    });
 
 
-
-    sidebarSpacer = document.createElement("div");
-    sidebarSpacer.className = "edit-image-top-menu";
-    sidebarSpacer.appendChild(submitButton);
-    sidebarContainer.appendChild(sidebarSpacer);
     
-
-    var instructions = document.createElement("div");
-    instructions.className = "edit-image-instructions";
-    instructions.innerHTML = 'color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span>';
-    sidebarContainer.appendChild(instructions);
-
-    container.className = "edit-main-container";
-    container.appendChild(annotatorContainer);
-    container.appendChild(sidebarContainer);
     return container;
   }
 

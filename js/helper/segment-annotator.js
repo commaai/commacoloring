@@ -365,7 +365,7 @@ function (Layer, segmentation, morph) {
     });
     //polygon on/off with ctrl-key
     window.onkeyup = function(e) {
-      var key = e.keyCode ? e.keyCode : e.which;
+      /*var key = e.keyCode ? e.keyCode : e.which;
       if (key == 17) {
         if (annotator.mode=="polygon") {
           annotator.mode = "superpixel";
@@ -374,7 +374,7 @@ function (Layer, segmentation, morph) {
           annotator._updateHighlight(null);
         }
         annotator._emptyPolygonPoints();
-      }
+      }*/
     };
   };
 
@@ -437,21 +437,7 @@ function (Layer, segmentation, morph) {
   };
 
   Annotator.prototype._getClickPos = function (event) {
-    var container = this.container,
-        containerRect = container.getBoundingClientRect(), win = window, docElem = document.documentElement,
-        offsetLeft = containerRect.left + (win.pageXOffset || docElem.scrollLeft) - (docElem.clientLeft || 0),
-        offsetTop = containerRect.top + (win.pageYOffset || docElem.scrollTop) - (docElem.clientTop || 0),
-        x = Math.round(
-          (event.pageX - offsetLeft + container.scrollLeft) *
-          (container.offsetWidth / container.scrollWidth)
-          ),
-        y = Math.round(
-          (event.pageY - offsetTop + container.scrollTop) *
-          (container.offsetHeight / container.scrollHeight)
-          ),
-    x = Math.max(Math.min(x, this.layers.visualization.canvas.width - 1), 0);
-    y = Math.max(Math.min(y, this.layers.visualization.canvas.height - 1), 0);
-    return [x, y];
+    return [event.offsetX, event.offsetY];
   };
 
   // polygon tool.
