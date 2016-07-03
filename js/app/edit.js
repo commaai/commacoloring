@@ -22,16 +22,20 @@ function(Layer, Annotator, util) {
 
     function getCount() {
       var count = Cookies.get("count");
-      try {
-        count = parseInt(count);
-      } catch(err) {
+      if (count !== undefined) {
+        try {
+          count = parseInt(count);
+        } catch(err) {
+          count = 0;
+        }
+      } else {
         count = 0;
       }
       return count;
     }
 
     var count = getCount();
-    $(".edit-image-count").html("you've submitted "+count.toString()+" image"+(count!=1?"s":"")+".<br/>keep up the good work!");
+      $(".edit-image-count").html("you've submitted "+count.toString()+" image"+(count!=1?"s":"")+"."+(count>0?"<br/>keep up the good work!":""));
     if (count > 0) {
       $(".edit-image-count")[0].style.color = "#008000";
     }
