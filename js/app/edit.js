@@ -39,7 +39,7 @@ function(Layer, Annotator, util) {
 
     var instructions = document.createElement("div");
     instructions.className = "edit-image-instructions";
-    instructions.innerHTML = 'color the picture appropriately, click Submit, earn a <span style="color: goldenrod">comma point</span>';
+    instructions.innerHTML = 'color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span>';
     sidebarContainer.appendChild(instructions);
 
     container.className = "edit-main-container";
