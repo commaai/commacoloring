@@ -23,10 +23,11 @@ function(Layer, Annotator, util) {
 
     $(".img-submit").click(function() {
       var data = annotator.export();
+      var name = annotator.imageName;
+      $.post("/submit", { data: data, name: name }, 'json');  
       //console.log(data);
-      window.open(data);
+      //window.open(data);
     });
-
 
     
     return container;
@@ -267,41 +268,39 @@ function(Layer, Annotator, util) {
 
   // Entry point.
   function render(data, params) {
-    //var id = parseInt(params.id, 10);
-    // hacks
-    var id = 1;
-    if (isNaN(id))
-      throw("Invalid id");
-    var annotator = new Annotator(data.imageURLs[id], {
-          width: params.width,
-          height: params.height,
-          colormap: data.colormap,
-          superpixelOptions: { method: "slic", regionSize: 25 },
-          onload: function () {
-            if (data.annotationURLs)
-              annotator.import(data.annotationURLs[id]);
-            annotator.hide("boundary");
-            boundaryFlash();
-          },
-          onchange: function () {
-            var activeLabels = this.getUniqueLabels(),
-                legendClass = "edit-sidebar-legend-label",
-                legendActiveClass = "edit-sidebar-legend-label-active",
-                elements = document.getElementsByClassName(legendClass),
-                i;
-            for (i = 0; i < elements.length; ++i)
-              elements[i].classList.remove(legendActiveClass);
-            for (i = 0; i < activeLabels.length; ++i)
-              elements[activeLabels[i]].classList.add(legendActiveClass);
-          },
-          onrightclick: function (label) {
-            document.getElementById("label-" + label + "-button").click();
-          },
-          onmousemove: highlightLabel
-        });
-    document.body.appendChild(createMainDisplay(params, data, annotator));
+    $.getJSON("/sample", function(json) {
+      var annotator = new Annotator(json.data, {
+            width: params.width,
+            height: params.height,
+            colormap: data.colormap,
+            superpixelOptions: { method: "slic", regionSize: 25 },
+            onload: function () {
+              if (data.annotationURLs)
+                annotator.import(data.annotationURLs[id]);
+              annotator.hide("boundary");
+              boundaryFlash();
+            },
+            onchange: function () {
+              var activeLabels = this.getUniqueLabels(),
+                  legendClass = "edit-sidebar-legend-label",
+                  legendActiveClass = "edit-sidebar-legend-label-active",
+                  elements = document.getElementsByClassName(legendClass),
+                  i;
+              for (i = 0; i < elements.length; ++i)
+                elements[i].classList.remove(legendActiveClass);
+              for (i = 0; i < activeLabels.length; ++i)
+                elements[activeLabels[i]].classList.add(legendActiveClass);
+            },
+            onrightclick: function (label) {
+              document.getElementById("label-" + label + "-button").click();
+            },
+            onmousemove: highlightLabel
+          });
+      annotator.imageName = json.name;
+      document.body.appendChild(createMainDisplay(params, data, annotator));
+    });
   }
-
   return render;
 });
+
 

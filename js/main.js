@@ -3,13 +3,13 @@
 
 data = {
   "labels": [
-    "unlabelled, eraser",
+    "eraser",
     "sky",
-    "drivable; road",
-    "on road markings; lane",
-    "undrivable; trees, curbs",
-    "movable; cars, people",
-    "signs, traffic lights",
+    "road (drivable surfaces)",
+    "lane lines (on road markings)",
+    "undrivable (trees, curbs, etc.)",
+    "movable (cars, people, etc.)",
+    "signs and traffic lights",
     "my car"
   ],
   "imageURLs": [
@@ -27,8 +27,7 @@ requirejs(['app/edit',
            'helper/colormap',
            'helper/util'],
 function(editPage, colormap, util) {
-  var dataURL = "data/example.json",  // Change this to another dataset.
-      params = util.getQueryParams();
+  var params = util.getQueryParams();
 
   // Create a colormap for display. The following is an example.
   function createColormap(label, labels) {
