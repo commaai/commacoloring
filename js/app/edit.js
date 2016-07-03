@@ -51,11 +51,12 @@ function(Layer, Annotator, util) {
       } else {
         var data = annotator.export();
         var name = annotator.imageName;
-        $.post("/submit", { data: data, name: name, track: Cookies.get("track") }, 'json');  
-        var count = getCount();
-        count += 1;
-        Cookies.set("count", count.toString());
-        location.reload();
+        $.post("/submit", { data: data, name: name, track: Cookies.get("track") }, function() {
+          var count = getCount();
+          count += 1;
+          Cookies.set("count", count.toString());
+          location.reload();
+        });
       }
     });
 
