@@ -78,7 +78,7 @@ body {
   position: relative;
   background-color: #eee;
   cursor: pointer;
-  padding-left: 2px;
+  padding: 5px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -145,13 +145,29 @@ body {
   font-size: 20px;
   max-width: 400px;
   white-space: normal;
-  padding-top: 50px;
+}
+
+.edit-image-disclaimer {
+  padding: 5px;
+  font-family: monospace;
+  font-size: 10px;
+  max-width: 400px;
+  white-space: normal;
+}
+
+.edit-image-count {
+  padding: 5px;
+  font-family: monospace;
+  font-size: 15px;
+  max-width: 400px;
+  white-space: normal;
+  padding-top: 20px;
 }
 
 .img-submit {
   padding: 20px;
   margin: 25px;
-  margin-left: 100px;
+  margin-left: 130px;
   text-align: center;
   font-family: monospace;
   font-size: 20px;

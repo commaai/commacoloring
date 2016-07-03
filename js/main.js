@@ -6,7 +6,7 @@ data = {
     "eraser",
     "sky",
     "road (drivable surfaces)",
-    "lane lines (on road markings)",
+    "road marks (lane lines, arrows)",
     "undrivable (trees, curbs, etc.)",
     "movable (cars, people, etc.)",
     "signs and traffic lights",

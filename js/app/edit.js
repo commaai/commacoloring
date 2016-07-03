@@ -20,16 +20,37 @@ function(Layer, Annotator, util) {
 
     var container = $(".edit-main-container")[0];
 
+    function getCount() {
+      var count = Cookies.get("count");
+      try {
+        count = parseInt(count);
+      } catch(err) {
+        count = 0;
+      }
+      return count;
+    }
+
+    var count = getCount();
+    $(".edit-image-count").html("you've submitted "+count.toString()+" image"+(count!=1?"s":"")+".<br/>keep up the good work!");
+    if (count > 0) {
+      $(".edit-image-count")[0].style.color = "#008000";
+    }
 
     $(".img-submit").click(function() {
-      var data = annotator.export();
-      var name = annotator.imageName;
-      $.post("/submit", { data: data, name: name }, 'json');  
-      //console.log(data);
-      //window.open(data);
+      var percent = annotator.getFilledPercent();
+      if (percent < 0.10) {
+        alert("Please color in the image before clicking submit!");
+      } else {
+        var data = annotator.export();
+        var name = annotator.imageName;
+        $.post("/submit", { data: data, name: name }, 'json');  
+        var count = getCount();
+        count += 1;
+        Cookies.set("count", count.toString());
+        location.reload();
+      }
     });
 
-    
     return container;
   }
 
@@ -59,7 +80,7 @@ function(Layer, Annotator, util) {
     spacer1.className = "edit-image-top-spacer";
     boundaryButton.id = "boundary-button";
     boundaryButton.className = "edit-image-top-button";
-    boundaryButton.appendChild(document.createTextNode("boundary"));
+    boundaryButton.appendChild(document.createTextNode("pixel size"));
     boundaryButton.addEventListener("click", function () {
       if (boundaryFlashTimeoutID)
         window.clearTimeout(boundaryFlashTimeoutID);
@@ -89,7 +110,7 @@ function(Layer, Annotator, util) {
     });
     imageButton.className = "edit-image-top-button " +
                             "edit-image-top-button-enabled";
-    imageButton.appendChild(document.createTextNode("image"));
+    imageButton.appendChild(document.createTextNode("brightness"));
     imageButton.addEventListener("click", function () {
       if (imageButton.classList.contains("edit-image-top-button-enabled"))
         annotator.hide("image");

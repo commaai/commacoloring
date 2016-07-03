@@ -190,6 +190,20 @@ function (Layer, segmentation, morph) {
     return this;
   };
 
+  Annotator.prototype.getFilledPercent = function () {
+    var layer = this.layers.visualization;
+    var data = layer.imageData.data;
+    var tt = 0;
+    var dd = 0;
+
+    for (var i = 0; i < data.length; i+= 4) {
+      var pxl = data[i] + data[i+1] + data[i+2];
+      if (pxl != 255*3) tt += 1;
+      dd += 1;
+    }
+    return tt*1.0/dd;
+  }
+
   // Highlight a specified label.
   Annotator.prototype.highlightLabel = function (label) {
     var pixels = [],
