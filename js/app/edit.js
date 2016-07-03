@@ -147,9 +147,9 @@ function(Layer, Annotator, util) {
     });
     //
     container.className = "edit-image-top-menu";
-    container.appendChild(zoomOutButton);
-    container.appendChild(zoomInButton);
-    container.appendChild(spacer1);
+    //container.appendChild(zoomOutButton);
+    //container.appendChild(zoomInButton);
+    //container.appendChild(spacer1);
     container.appendChild(finerButton);
     container.appendChild(boundaryButton);
     container.appendChild(coarserButton);
@@ -256,7 +256,7 @@ function(Layer, Annotator, util) {
     spacer4.className = "edit-sidebar-spacer";
     container.className = "edit-sidebar";
     container.appendChild(labelPicker);
-    container.appendChild(spacer1);
+    /*container.appendChild(spacer1);
     container.appendChild(undoButton);
     container.appendChild(redoButton);
     container.appendChild(spacer2);
@@ -265,8 +265,8 @@ function(Layer, Annotator, util) {
     container.appendChild(polygonToolButton);
     container.appendChild(superpixelToolButton);
     container.appendChild(manualParagraph);
-    //container.appendChild(spacer4);
-    container.appendChild(exportButton);
+    container.appendChild(spacer4);
+    container.appendChild(exportButton);*/
     return container;
   }
 
@@ -437,7 +437,7 @@ function(Layer, Annotator, util) {
           },
           onmousemove: highlightLabel
         });
-    document.body.appendChild(createNavigationMenu(params, data, annotator));
+    //document.body.appendChild(createNavigationMenu(params, data, annotator));
     document.body.appendChild(createMainDisplay(params, data, annotator));
   }
 

@@ -96,8 +96,9 @@
 .edit-sidebar-legend-label {
   color: gray;
   display: inline-block;
-  width: 10em;
+  width: 15em;
   padding: 0 0.3em;
+  font-size: 20px;
 }
 .edit-sidebar-legend-label-active {
   color: black;
@@ -132,7 +133,7 @@
   margin-left: 1em;
 }
 .edit-image-top-menu {
-  height: 1em;
+  height: 5em;
   font-family: monospace;
 }
 .edit-image-top-menu-item {
@@ -149,6 +150,7 @@
   padding: 0 2px;
   min-width: 1em;
   text-align: center;
+  font-size: 20px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
