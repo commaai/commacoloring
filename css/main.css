@@ -1,9 +1,5 @@
-html {
-  transform: scale(1.5);
-  transform-origin: top left;
-}
-
 body {
+  transform-origin: top left;
   width: 1400px;
 }
 

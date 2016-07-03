@@ -1,0 +1,4 @@
+gunicorn==19.4.5
+Flask==0.10.1
+psycopg2==2.6.1
+

@@ -6,6 +6,13 @@
   <script src="js/jquery.min.js"></script>
   <script src="js/js.cookie.js"></script>
   <script data-main="js/main.js" src="js/require.js"></script>
+  <script>
+  function handleResize() {
+    document.body.style.transform = "scale("+(window.innerWidth/1450.0)+")";
+  }
+  window.onresize = handleResize;
+  window.onload = handleResize;
+  </script>
 </head>
 <body>
 <div class="edit-main-container">

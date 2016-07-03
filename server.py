@@ -2,6 +2,21 @@
 from flask import Flask, request, send_from_directory, Response
 import random, os, base64, json
 
+# connect to the database
+import psycopg2
+import urlparse
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+
 # set the project root directory as the static folder, you can set others.
 app = Flask(__name__, static_url_path='')
 
