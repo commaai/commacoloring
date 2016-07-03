@@ -19,11 +19,10 @@ data = {
   ]
 };
 
-requirejs(['app/index',
-           'app/edit',
+requirejs(['app/edit',
            'helper/colormap',
            'helper/util'],
-function(indexPage, editPage, colormap, util) {
+function(editPage, colormap, util) {
   var dataURL = "data/example.json",  // Change this to another dataset.
       params = util.getQueryParams();
 
