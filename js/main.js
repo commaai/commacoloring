@@ -1,5 +1,24 @@
 /* Main page dispatcher.
 */
+
+data = {
+  "labels": [
+    "unlabelled, eraser",
+    "sky",
+    "drivable; road",
+    "on road markings; lane",
+    "undrivable; trees, curbs",
+    "movable; cars, people",
+    "signs, traffic lights",
+    "my car"
+  ],
+  "imageURLs": [
+    "data/driving/000.png",
+    "data/driving/007.png",
+    "data/driving/014.png"
+  ]
+};
+
 requirejs(['app/index',
            'app/edit',
            'helper/colormap',
@@ -24,10 +43,8 @@ function(indexPage, editPage, colormap, util) {
 
   // Load dataset before rendering a view.
   function renderPage(renderer) {
-    util.requestJSON(dataURL, function(data) {
-      data.colormap = createColormap(params.label, data.labels);
-      renderer(data, params);
-    });
+    data.colormap = createColormap(params.label, data.labels);
+    renderer(data, params);
   }
 
   switch(params.view) {
