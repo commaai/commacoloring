@@ -34,7 +34,7 @@ if __name__ == "__main__":
       i += 1
     print "got", i
     st = json.dumps(lst)
-    open("dump.json", "w").write(st)
+    open("/staging/dump.json", "w").write(st)
   else:
     #app.run(debug=True, host="0.0.0.0")
     app.run(debug=True)
