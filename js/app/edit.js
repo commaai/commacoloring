@@ -4,10 +4,6 @@ define(['../image/layer',
         '../helper/segment-annotator',
         '../helper/util'],
 function(Layer, Annotator, util) {
-  function do_submit() {
-    alert("submit");
-  }
-
   // Create the main content block.
   function createMainDisplay(params, data, annotator) {
     var container = document.createElement("div"),
@@ -26,7 +22,11 @@ function(Layer, Annotator, util) {
 
     submitButton = document.createElement("button");
     submitButton.className = "img-submit";
-    submitButton.onclick = do_submit;
+    submitButton.onclick = function() {
+      var data = annotator.export();
+      //console.log(data);
+      window.open(data);
+    };
     submitButton.innerHTML = "submit";
 
 

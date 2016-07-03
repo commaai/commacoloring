@@ -170,11 +170,11 @@ function (Layer, segmentation, morph) {
 
   // Export the annotation in data URL.
   Annotator.prototype.export = function () {
-    this.layers.annotation.setAlpha(255);
-    this.layers.annotation.render();
-    var data = this.layers.annotation.canvas.toDataURL();
-    this.layers.annotation.setAlpha(0);
-    this.layers.annotation.render();
+    this.layers.visualization.setAlpha(255);
+    this.layers.visualization.render();
+    var data = this.layers.visualization.canvas.toDataURL();
+    this.layers.visualization.setAlpha(this.visualizationAlpha);
+    this.layers.visualization.render();
     return data;
   };
 
