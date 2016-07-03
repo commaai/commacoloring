@@ -4,55 +4,8 @@ define(['../image/layer',
         '../helper/segment-annotator',
         '../helper/util'],
 function(Layer, Annotator, util) {
-  // Create the navigation menu.
-  function createNavigationMenu(params, data, annotator) {
-    var navigationMenu = document.createElement("p"),
-        navigation = createNavigation(params, data),
-        idBlock = document.createElement("div");
-    idBlock.className = "edit-top-menu-block";
-    idBlock.appendChild(
-        document.createTextNode(" ID = " + params.id));
-    navigationMenu.appendChild(navigation);
-    navigationMenu.appendChild(idBlock);
-    return navigationMenu;
-  }
-
-  // Create the page navigation.
-  function createNavigation(params, data) {
-    var id = parseInt(params.id, 10),
-        container = document.createElement("div"),
-        indexAnchor = document.createElement("a"),
-        indexAnchorText = document.createTextNode("Index"),
-        prevAnchorText = document.createTextNode("Prev"),
-        nextAnchorText = document.createTextNode("Next"),
-        prevAnchor, nextAnchor;
-    indexAnchor.href = util.makeQueryParams({ view: "index" });
-    indexAnchor.appendChild(indexAnchorText);
-    if (id > 0) {
-      prevAnchor = document.createElement("a");
-      prevAnchor.appendChild(prevAnchorText);
-      prevAnchor.href = util.makeQueryParams(params, {
-        id: id - 1
-      });
-    }
-    else
-      prevAnchor = prevAnchorText;
-    if (id < data.imageURLs.length - 1) {
-      nextAnchor = document.createElement("a");
-      nextAnchor.appendChild(nextAnchorText);
-      nextAnchor.href = util.makeQueryParams(params, {
-        id: id + 1
-      });
-    }
-    else
-      nextAnchor = nextAnchorText;
-    container.appendChild(prevAnchor);
-    container.appendChild(document.createTextNode(" "));
-    container.appendChild(indexAnchor);
-    container.appendChild(document.createTextNode(" "));
-    container.appendChild(nextAnchor);
-    container.classList.add("edit-top-menu-block");
-    return container;
+  function do_submit() {
+    alert("submit");
   }
 
   // Create the main content block.
@@ -64,12 +17,31 @@ function(Layer, Annotator, util) {
         sidebarContainer = document.createElement("div"),
         sidebar = createSidebar(params, data, annotator);
     annotatorContainer.className = "edit-image-display";
-    annotatorContainer.appendChild(annotatorTopMenu);
+    sidebarSpacer.appendChild(annotatorTopMenu);
     annotatorContainer.appendChild(annotator.container);
     sidebarSpacer.className = "edit-image-top-menu";
     sidebarContainer.className = "edit-image-display";
     sidebarContainer.appendChild(sidebarSpacer);
     sidebarContainer.appendChild(sidebar);
+
+    submitButton = document.createElement("button");
+    submitButton.className = "img-submit";
+    submitButton.onclick = do_submit;
+    submitButton.innerHTML = "submit";
+
+
+
+    sidebarSpacer = document.createElement("div");
+    sidebarSpacer.className = "edit-image-top-menu";
+    sidebarSpacer.appendChild(submitButton);
+    sidebarContainer.appendChild(sidebarSpacer);
+    
+
+    var instructions = document.createElement("div");
+    instructions.className = "edit-image-instructions";
+    instructions.innerHTML = 'color the picture appropriately, click Submit, earn a <span style="color: goldenrod">comma point</span>';
+    sidebarContainer.appendChild(instructions);
+
     container.className = "edit-main-container";
     container.appendChild(annotatorContainer);
     container.appendChild(sidebarContainer);
@@ -184,119 +156,23 @@ function(Layer, Annotator, util) {
   // Create the sidebar.
   function createSidebar(params, data, annotator) {
     var container = document.createElement("div"),
-        labelPicker = createLabelPicker(params, data, annotator),
-        spacer1 = document.createElement("div"),
-        undoButton = document.createElement("div"),
-        redoButton = document.createElement("div"),
-        spacer2 = document.createElement("div"),
-        denoiseButton = document.createElement("div"),
-        spacer3 = document.createElement("div"),
-        superpixelToolButton = document.createElement("div"),
-        spacer4 = document.createElement("div"),
-        polygonToolButton = document.createElement("div"),
-        spacer5 = document.createElement("div"),
-        manualParagraph = document.createElement("p"),
-        spacer6 = document.createElement("div"),
-        exportButton = document.createElement("input"),
-        manualText;
-    exportButton.type = "submit";
-    exportButton.value = "export";
-    exportButton.className = "edit-sidebar-submit";
-    exportButton.addEventListener("click", function () {
-      var filename = (data.annotationURLs) ?
-          data.annotationURLs[params.id].split(/[\\/]/).pop() :
-          params.id + ".png";
-      downloadURI(annotator.export(), filename);
-    });
-    spacer1.className = "edit-sidebar-spacer";
-    undoButton.className = "edit-sidebar-button";
-    undoButton.appendChild(document.createTextNode("undo"));
-    undoButton.addEventListener("click", function () { annotator.undo(); });
-    redoButton.className = "edit-sidebar-button";
-    redoButton.appendChild(document.createTextNode("redo"));
-    redoButton.addEventListener("click", function () { annotator.redo(); });
-    spacer2.className = "edit-sidebar-spacer";
-    denoiseButton.className = "edit-sidebar-button";
-    denoiseButton.appendChild(document.createTextNode("denoise"));
-    denoiseButton.addEventListener("click", function () {
-      annotator.denoise();
-    });
-    superpixelToolButton.className = "edit-sidebar-button";
-    superpixelToolButton.appendChild(
-      document.createTextNode("Superpixel tool"));
-    superpixelToolButton.addEventListener("click", function () {
-      polygonToolButton.classList.remove("edit-sidebar-button-selected");
-      superpixelToolButton.classList.add("edit-sidebar-button-selected");
-      annotator._setMode("superpixel");
-    });
-    superpixelToolButton.classList.add("edit-sidebar-button-selected");
-    polygonToolButton.className = "edit-sidebar-button";
-    polygonToolButton.appendChild(document.createTextNode("Polygon tool"));
-    polygonToolButton.addEventListener("click", function () {
-      superpixelToolButton.classList.remove("edit-sidebar-button-selected");
-      polygonToolButton.classList.add("edit-sidebar-button-selected");
-      annotator._setMode("polygon");
-    });
-    spacer3.className = "edit-sidebar-spacer";
-    manualParagraph.appendChild(document.createTextNode("ctrl: toggle mode"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createTextNode("+Superpixel tool:"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createTextNode("left: mark"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createTextNode("right: pick label"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createTextNode("+Polygon tool:"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createTextNode("left: draw line"));
-    manualParagraph.appendChild(document.createElement("br"));
-    manualParagraph.appendChild(document.createTextNode("right: abort"));
-    spacer4.className = "edit-sidebar-spacer";
+        labelPicker = createLabelPicker(params, data, annotator);
     container.className = "edit-sidebar";
     container.appendChild(labelPicker);
-    /*container.appendChild(spacer1);
-    container.appendChild(undoButton);
-    container.appendChild(redoButton);
-    container.appendChild(spacer2);
-    container.appendChild(denoiseButton);
-    container.appendChild(spacer3);
-    container.appendChild(polygonToolButton);
-    container.appendChild(superpixelToolButton);
-    container.appendChild(manualParagraph);
-    container.appendChild(spacer4);
-    container.appendChild(exportButton);*/
     return container;
   }
 
   function createLabelButton(data, value, index, annotator) {
     var colorBox = document.createElement("span"),
         labelText = document.createElement("span"),
-        pickButton = document.createElement("div"),
-        popupButton = document.createElement("div"),
-        popupContainer = document.createElement("div");
+        pickButton = document.createElement("div");
     colorBox.className = "edit-sidebar-legend-colorbox";
     colorBox.style.backgroundColor =
         "rgb(" + data.colormap[index].join(",") + ")";
     labelText.appendChild(document.createTextNode(value));
     labelText.className = "edit-sidebar-legend-label";
-    popupButton.appendChild(document.createTextNode("+"));
-    popupButton.className = "edit-sidebar-popup-trigger";
-    popupButton.addEventListener("click",  function () {
-      popupContainer.classList.toggle("edit-sidebar-popup-active");
-    });
-    popupContainer.className = "edit-sidebar-popup";
-    popupContainer.appendChild(
-      createRelabelSelector(data, index, annotator, popupContainer)
-      );
-    popupContainer.addEventListener("click", function (event) {
-      event.preventDefault();
-    });
     pickButton.appendChild(colorBox);
     pickButton.appendChild(labelText);
-    pickButton.appendChild(popupButton);
-    pickButton.appendChild(popupContainer);
     pickButton.id = "label-" + index + "-button";
     pickButton.className = "edit-sidebar-button";
     pickButton.addEventListener("click", function () {
@@ -437,7 +313,6 @@ function(Layer, Annotator, util) {
           },
           onmousemove: highlightLabel
         });
-    //document.body.appendChild(createNavigationMenu(params, data, annotator));
     document.body.appendChild(createMainDisplay(params, data, annotator));
   }
 

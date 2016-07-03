@@ -129,6 +129,25 @@
 .edit-sidebar-spacer {
   height: 1em;
 }
+
+.edit-image-instructions {
+  padding: 5px;
+  font-family: monospace;
+  font-size: 20px;
+  max-width: 400px;
+  white-space: normal;
+  padding-top: 50px;
+}
+
+.img-submit {
+  padding: 20px;
+  margin: 25px;
+  margin-left: 100px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 20px;
+}
+
 .edit-sidebar-submit {
   margin-left: 1em;
 }
@@ -169,6 +188,7 @@
 .edit-image-display {
   display: inline-block;
   vertical-align: top;
+  margin-right: 10px;
 }
 .edit-main-container {
   white-space: nowrap;
