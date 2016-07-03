@@ -20,6 +20,10 @@ function(Layer, Annotator, util) {
 
     var container = $(".edit-main-container")[0];
 
+    if (Cookies.get("track") === undefined) {
+      Cookies.set("track", Math.floor(Math.random() * 10000000));
+    }
+
     function getCount() {
       var count = Cookies.get("count");
       if (count !== undefined) {
@@ -47,7 +51,7 @@ function(Layer, Annotator, util) {
       } else {
         var data = annotator.export();
         var name = annotator.imageName;
-        $.post("/submit", { data: data, name: name }, 'json');  
+        $.post("/submit", { data: data, name: name, track: Cookies.get("track") }, 'json');  
         var count = getCount();
         count += 1;
         Cookies.set("count", count.toString());

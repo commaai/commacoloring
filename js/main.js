@@ -19,9 +19,9 @@ data = {
   ]
 };
 
-require.config({
+/*require.config({
   urlArgs: "bust=" + (new Date()).getTime()
-});
+});*/
 
 requirejs(['app/edit',
            'helper/colormap',

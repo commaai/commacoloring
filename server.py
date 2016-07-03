@@ -2,20 +2,8 @@
 from flask import Flask, request, send_from_directory, Response
 import random, os, base64, json
 
-# connect to the database
-import psycopg2
-import urlparse
-
-urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ["DATABASE_URL"])
-
-conn = psycopg2.connect(
-    database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port
-)
+DATA_PATH = "data/driving/"
+from db import conn
 
 # set the project root directory as the static folder, you can set others.
 app = Flask(__name__, static_url_path='')
@@ -34,7 +22,6 @@ def send_data(path):
   return send_from_directory('data', path)
 """
 
-DATA_PATH = "data/driving/"
 
 @app.route('/sample')
 def sample():
@@ -45,8 +32,13 @@ def sample():
 
 @app.route('/submit', methods=["POST"])
 def submit():
-  print request.form
-  # TODO: push request.form into mongodb
+  data = request.form['data']
+  print request.form['name']
+  cur = conn.cursor()
+  # CREATE TABLE images (name varchar(200), data text, track text)
+  cur.execute("INSERT into images (name, data, track) VALUES (%s, %s, %s)", (request.form['name'], request.form['data'], request.form['track']))
+  conn.commit()
+  cur.close()
   return "thanks"
 
 @app.route('/')
