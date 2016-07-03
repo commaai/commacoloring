@@ -41,22 +41,7 @@ function(indexPage, editPage, colormap, util) {
       }));
   }
 
-  // Load dataset before rendering a view.
-  function renderPage(renderer) {
-    data.colormap = createColormap(params.label, data.labels);
-    renderer(data, params);
-  }
-
-  switch(params.view) {
-    case "index":
-      renderPage(indexPage);
-      break;
-    case "edit":
-      renderPage(editPage);
-      break;
-    default:
-      params.view = "index";
-      window.location = util.makeQueryParams(params);
-      break;
-  }
+  data.colormap = createColormap(params.label, data.labels);
+  editPage(data, params);
 });
+

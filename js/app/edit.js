@@ -283,7 +283,9 @@ function(Layer, Annotator, util) {
 
   // Entry point.
   function render(data, params) {
-    var id = parseInt(params.id, 10);
+    //var id = parseInt(params.id, 10);
+    // hacks
+    var id = 1;
     if (isNaN(id))
       throw("Invalid id");
     var annotator = new Annotator(data.imageURLs[id], {
