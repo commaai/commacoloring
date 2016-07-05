@@ -23,19 +23,5 @@ def root():
   return ''.join(ret)
 
 if __name__ == "__main__":
-  lst = []
-  if len(sys.argv) > 1:
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM images")
-    i = 0
-    for name, data, track in cur.fetchall():
-      print "downloading", name
-      lst.append({"name": name, "data": data, "track": track})
-      i += 1
-    print "got", i
-    st = json.dumps(lst)
-    open("/staging/dump.json", "w").write(st)
-  else:
-    #app.run(debug=True, host="0.0.0.0")
-    app.run(debug=True)
+  app.run(debug=True)
 

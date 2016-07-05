@@ -3,7 +3,7 @@ from flask import Flask, request, send_from_directory, Response
 import random, os, base64, json
 
 DATA_PATH = "data/driving/"
-from db import conn
+from tools.db import conn
 
 # set the project root directory as the static folder, you can set others.
 app = Flask(__name__, static_url_path='')
@@ -25,6 +25,7 @@ def send_data(path):
 
 @app.route('/sample')
 def sample():
+  # CREATE TABLE data (name varchar(200), data text)
   f = random.choice(os.listdir(DATA_PATH))
   dat = "data:image/png;base64,"+base64.b64encode(open(os.path.join(DATA_PATH, f)).read())
   ret = {"data": dat, "name": f}
