@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+from db import conn
+import os, sys, json, base64
+
+if __name__ == "__main__":
+  for f in sys.argv[1:]:
+    bn = os.path.basename(f)
+    print "uploading", f, "as", bn
+    dat = "data:image/png;base64,"+base64.b64encode(open(f).read())
+
+    cur = conn.cursor()
+    cur.execute("INSERT into data (name, data) VALUES (%s, %s)", (bn, dat))
+    conn.commit()
+    cur.close()
+
+
