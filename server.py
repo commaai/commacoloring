@@ -16,27 +16,21 @@ def send_js(path):
 def send_css(path):
   return send_from_directory('css', path)
 
-"""
-@app.route('/data/<path:path>')
-def send_data(path):
-  return send_from_directory('data', path)
-"""
-
-
 @app.route('/sample')
 def sample():
   # CREATE TABLE data (name varchar(200), data text)
-  f = random.choice(os.listdir(DATA_PATH))
-  dat = "data:image/png;base64,"+base64.b64encode(open(os.path.join(DATA_PATH, f)).read())
-  ret = {"data": dat, "name": f}
+  cur = conn.cursor()
+  cur.execute("SELECT name, data FROM data OFFSET floor(random() * (SELECT count(*) FROM data)) LIMIT 1")
+  name, data = cur.fetchone()
+  ret = {"data": data, "name": name}
   return Response(json.dumps(ret))
 
 @app.route('/submit', methods=["POST"])
 def submit():
+  # CREATE TABLE images (name varchar(200), data text, track text)
   data = request.form['data']
   print request.form['name']
   cur = conn.cursor()
-  # CREATE TABLE images (name varchar(200), data text, track text)
   cur.execute("INSERT into images (name, data, track) VALUES (%s, %s, %s)", (request.form['name'], request.form['data'], request.form['track']))
   conn.commit()
   cur.close()
