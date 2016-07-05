@@ -1,0 +1,14 @@
+comma.ai Adult Coloring Book
+====================
+
+Based on https://github.com/kyamagu/js-segment-annotator
+Thanks Kota Yamaguchi :)
+
+Added a quick Heroku compatible server
+
+To create the tables, run "heroku pg:psql" and
+  CREATE TABLE data (name varchar(200), data text)
+  CREATE TABLE images (name varchar(200), data text, track text)
+
+Run "tools/uploader.py <paths to png files>" to upload data
+

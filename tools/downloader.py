@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 from db import conn
 import json
+import sys
+
+OUTFILE = "/staging/dump.json"
 
 if __name__ == "__main__":
+  if len(sys.argv) > 1:
+    OUTFILE = sys.argv[1]
   lst = []
   cur = conn.cursor()
   cur.execute("SELECT * FROM images")
@@ -13,5 +18,5 @@ if __name__ == "__main__":
     i += 1
   print "got", i
   st = json.dumps(lst)
-  open("/staging/dump.json", "w").write(st)
+  open(OUTFILE, "w").write(st)
 
