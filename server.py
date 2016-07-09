@@ -18,7 +18,6 @@ def send_css(path):
 
 @app.route('/sample')
 def sample():
-  # CREATE TABLE data (name varchar(200), data text)
   cur = conn.cursor()
   cur.execute("SELECT name, data FROM data OFFSET floor(random() * (SELECT count(*) FROM data)) LIMIT 1")
   name, data = cur.fetchone()
@@ -27,11 +26,10 @@ def sample():
 
 @app.route('/submit', methods=["POST"])
 def submit():
-  # CREATE TABLE images (name varchar(200), data text, track text)
   data = request.form['data']
   print request.form['name']
   cur = conn.cursor()
-  cur.execute("INSERT into images (name, data, track) VALUES (%s, %s, %s)", (request.form['name'], request.form['data'], request.form['track']))
+  cur.execute("INSERT into images2 (name, data, track, email, gid) VALUES (%s, %s, %s, %s, %s)", (request.form['name'], request.form['data'], request.form['track'], request.form['email'], request.form['gid']))
   conn.commit()
   cur.close()
   return "thanks"

@@ -160,10 +160,13 @@ body {
   padding-top: 20px;
 }
 
+.img-submit-box {
+  text-align: center;
+}
+
 .img-submit {
   padding: 20px;
   margin: 25px;
-  margin-left: 130px;
   text-align: center;
   font-family: monospace;
   font-size: 20px;
@@ -218,4 +221,22 @@ body {
 .edit-top-menu-block {
   display: inline-block;
   margin: 0 .5em;
+}
+.sign-in-box {
+  text-align: center;
+  padding: 10px;
+}
+.sign-in {
+  font-family: monospace;
+}
+.signed-in {
+  font-family: monospace;
+  background-color: #e0e0e0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: gray;
+}
+
+.signed-in-email {
+  color: black;
 }

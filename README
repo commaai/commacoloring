@@ -11,10 +11,13 @@ Added a quick Heroku compatible server
 Usage
 =====
 
+Local: "heroku local"
+
 Upload to Heroku (free tier is fine) 
 
 To create the tables, run "heroku pg:psql" and
   CREATE TABLE data (name varchar(200), data text)
-  CREATE TABLE images (name varchar(200), data text, track text)
+  // CREATE TABLE images (name varchar(200), data text, track text)
+  CREATE TABLE images2 (name varchar(200), data text, track text, email text, gid text)
 
 Run "tools/uploader.py <paths to png files>" to upload data

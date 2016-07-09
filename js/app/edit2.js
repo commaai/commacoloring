@@ -51,7 +51,7 @@ function(Layer, Annotator, util) {
       } else {
         var data = annotator.export();
         var name = annotator.imageName;
-        $.post("/submit", { data: data, name: name, track: Cookies.get("track") }, function() {
+        $.post("/submit", { data: data, name: name, track: Cookies.get("track"), email: user_email, gid: user_gid }, function() {
           var count = getCount();
           count += 1;
           Cookies.set("count", count.toString());
