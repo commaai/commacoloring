@@ -115,6 +115,8 @@ function (Layer, segmentation, morph) {
     }
     this._fillPixels(offsets, labels);
     this.layers.visualization.render();
+    if (typeof this.onchange === "function")
+      this.onchange.call(this);
   };
 
   // Get unique labels in the current annotation.
