@@ -42,6 +42,10 @@ def submit():
 def root():
   return send_from_directory('', 'index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+  return send_from_directory('', 'favicon.ico')
+
 if __name__ == "__main__":
   app.run(debug=True)
 
