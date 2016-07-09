@@ -5,7 +5,6 @@
   <link href="css/main.css" rel="stylesheet" type="text/css">
   <script src="js/jquery.min.js"></script>
   <script src="js/js.cookie.js"></script>
-  <script data-main="js/main.js" src="js/require.js"></script>
   <script>
   function handleResize() {
     document.body.style.transform = "scale("+(window.innerWidth/1450.0)+")";
@@ -20,6 +19,10 @@
 <!-- left hand panel -->
 <div class="edit-image-display">
 <div id="lhp"></div>
+<div class="toolchest">
+<img class="tool" id="tool-wand" src="img/wand.png" />
+<img class="tool" id="tool-brush" src="img/brush.png" />
+</div>
 <div class="img-submit-box"><button class="img-submit">submit</button></div>
 <div class="edit-image-instructions">color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span>*</div>
 <div class="edit-image-disclaimer">*<span style="color: goldenrod">comma points</span> redeemed to google account. you will get access soon</div>
@@ -38,6 +41,7 @@
 </div>
 </body>
 <head>
+  <script data-main="js/main.js" src="js/require.js"></script>
   <script src="js/auth.js"></script>
   <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
 </head>

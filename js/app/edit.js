@@ -13,6 +13,32 @@ function(Layer, Annotator, util) {
     sidebarContainer.appendChild(annotatorTopMenu);
     sidebarContainer.appendChild(sidebar);
 
+    function tool_select(tool) {
+      $(tool).css("background-color", "#c0c0c0");
+      $(tool).css("border-width", "2px");
+      $(tool).css("margin", "0px");
+    }
+    function tool_deselect(tool) {
+      $(tool).css("background-color", "#FFFFFF");
+      $(tool).css("border-width", "1px");
+      $(tool).css("margin", "1px");
+    }
+
+    // tool selection
+    $("#tool-wand").click(function(e) {
+      tool_select('#tool-wand')
+      tool_deselect('#tool-brush')
+      annotator._setMode('superpixel');
+    });
+
+    $("#tool-brush").click(function(e) {
+      tool_select('#tool-brush')
+      tool_deselect('#tool-wand')
+      annotator._setMode('brush');
+    });
+
+    tool_select('#tool-wand');
+    tool_deselect('#tool-brush');
 
     // set up right panel
     var annotatorContainer = $("#rhp")[0];
@@ -45,6 +71,7 @@ function(Layer, Annotator, util) {
     }
 
     $(".img-submit").click(function() {
+      //open(annotator.export());
       var percent = annotator.getFilledPercent();
       if (percent < 0.10) {
         alert("Please color in the image before clicking submit!");

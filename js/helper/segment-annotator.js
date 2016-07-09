@@ -88,6 +88,7 @@ function (Layer, segmentation, morph) {
     return this.currentHistoryRecord < 0;
   };
 
+
   // Redo the edit.
   Annotator.prototype.redo = function () {
     if (this.currentHistoryRecord >= this.history.length - 1)
@@ -98,6 +99,22 @@ function (Layer, segmentation, morph) {
     if (typeof this.onchange === "function")
       this.onchange.call(this);
     return this.currentHistoryRecord >= this.history.length;
+  };
+
+  // Write the brush tool
+  Annotator.prototype.brush = function (pos, label) {
+    var offsets = [], labels = [];
+    for (var y = -3; y <= 3; y++) {
+      for (var x = -3; x <= 3; x++) {
+        // it is circle bitches
+        if ((x*x + y*y) > 9) continue;
+        var offset = 4 * ((pos[1]+y) * this.layers.visualization.canvas.width + (pos[0]+x));
+        offsets.push(offset);
+        labels.push(label);
+      }
+    }
+    this._fillPixels(offsets, labels);
+    this.layers.visualization.render();
   };
 
   // Get unique labels in the current annotation.
@@ -350,11 +367,17 @@ function (Layer, segmentation, morph) {
           else
             annotator.onrightclick.call(annotator, existingLabel);
         } else {
+          if (annotator.mode === "brush" && event.button === 0) {
+            annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
+            //annotator._fillPixels([offset], [annotator.currentLabel]);
+            //var pos = annotator._getClickPos(event);
+            //p(pos);
+          }
           if (event.button === 0 && annotator.mode === "polygon") {
             annotator._addPolygonPoint(event);
             if (annotator._checkLineIntersection())
               annotator._addPolygonToAnnotation();
-          } else {
+          } else if (annotator.mode === "superpixel") {
             annotator._updateAnnotation(pixels, annotator.currentLabel);
           }
           if (typeof annotator.onleftclick === "function")
@@ -613,6 +636,8 @@ function (Layer, segmentation, morph) {
       var offset = pixels[i],
           label = labels[i],
           color = this.colormap[label];
+
+      p([offset, label, color]);
       _setEncodedLabel(annotationData, offset, label);
       visualizationData[offset + 0] = color[0];
       visualizationData[offset + 1] = color[1];

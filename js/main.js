@@ -23,7 +23,7 @@ data = {
   urlArgs: "bust=" + (new Date()).getTime()
 });*/
 
-requirejs(['app/edit2',
+requirejs(['app/edit',
            'helper/colormap',
            'helper/util'],
 function(editPage, colormap, util) {
