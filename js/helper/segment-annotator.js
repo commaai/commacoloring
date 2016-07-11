@@ -555,6 +555,9 @@ function (Layer, segmentation, morph) {
     // update annotation.
     annotator._updateAnnotation(pixelsPolygon, annotator.currentLabel);
     annotator._emptyPolygonPoints();
+
+    // cause you always click afterward
+    window.setTimeout(function() { annotator._emptyPolygonPoints(); }, 50);
   };
 
   Annotator.prototype._checkLineIntersection = function () {
