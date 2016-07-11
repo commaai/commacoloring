@@ -25,20 +25,31 @@ function(Layer, Annotator, util) {
     }
 
     // tool selection
+    // TODO: make this not shit
     $("#tool-wand").click(function(e) {
-      tool_select('#tool-wand')
-      tool_deselect('#tool-brush')
+      tool_select('#tool-wand');
+      tool_deselect('#tool-brush');
+      tool_deselect('#tool-polygon');
       annotator._setMode('superpixel');
     });
 
     $("#tool-brush").click(function(e) {
-      tool_select('#tool-brush')
-      tool_deselect('#tool-wand')
+      tool_select('#tool-brush');
+      tool_deselect('#tool-wand');
+      tool_deselect('#tool-polygon');
       annotator._setMode('brush');
+    });
+
+    $("#tool-polygon").click(function(e) {
+      tool_select('#tool-polygon');
+      tool_deselect('#tool-wand');
+      tool_deselect('#tool-brush');
+      annotator._setMode('polygon');
     });
 
     tool_select('#tool-wand');
     tool_deselect('#tool-brush');
+    tool_deselect('#tool-polygon');
 
     // set up right panel
     var annotatorContainer = $("#rhp")[0];
