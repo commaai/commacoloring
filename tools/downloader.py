@@ -20,7 +20,7 @@ if __name__ == "__main__":
   # support images2 download
   cur.execute("SELECT * FROM images2")
   for name, data, track, email, gid in cur.fetchall():
-    print "downloading", name
+    print "downloading", name, email
     lst.append({"name": name, "data": data, "track": track, "email": email, "gid": gid})
     i += 1
 
