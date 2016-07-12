@@ -52,6 +52,49 @@ function (Layer, segmentation, morph) {
     });
   }
 
+  Annotator.prototype.setFromURL = function(imageURL) {
+    //p(this.colormap);
+    //p(imageURL);
+    var canvas = document.createElement('canvas');
+
+    // set canvas dimensions.
+    canvas.width = this.layers.annotation.canvas.width;
+    canvas.height = this.layers.annotation.canvas.height;
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+    var annotator = this;
+    img.onload = function() {
+      ctx.drawImage(img, 0, 0);
+      var vd = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      var color_lookup = {};
+      for (var i = 0;i < annotator.colormap.length; i++) {
+        var color = _getEncodedLabel(annotator.colormap[i], 0);
+        color_lookup[color] = i;
+      }
+      // black is nothing
+      //p(color_lookup);
+      p("loaded suggestion");
+      var offsets = [], labels = [];
+      for (y = 0; y < canvas.height; y++) {
+        for (x = 0; x < canvas.width; x++) {
+          var offset = (x + y*canvas.width)*4;
+          var tc = _getEncodedLabel(vd, offset);
+          var lbl = color_lookup[tc];
+          if (lbl !== undefined) {
+            offsets.push(offset);
+            labels.push(lbl);
+          }
+        }
+      }
+      annotator._fillPixels(offsets, labels);
+      annotator.layers.visualization.render();
+      if (typeof annotator.onchange === "function")
+        annotator.onchange.call(annotator);
+    };
+    img.src = imageURL;
+  };
+
   // Run superpixel segmentation.
   Annotator.prototype.resetSuperpixels = function (options) {
     options = options || {};
@@ -641,8 +684,7 @@ function (Layer, segmentation, morph) {
       var offset = pixels[i],
           label = labels[i],
           color = this.colormap[label];
-
-      p([offset, label, color]);
+      //p([offset, label, color]);
       _setEncodedLabel(annotationData, offset, label);
       visualizationData[offset + 0] = color[0];
       visualizationData[offset + 1] = color[1];

@@ -254,4 +254,9 @@ body {
   background-color: #ffffff;
   border: 1px solid black;
 }
+.suggest-button {
+  position: relative;
+  top: -25px;
+  margin-left: 5px;
+}
 

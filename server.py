@@ -28,6 +28,14 @@ def sample():
   ret = {"data": data, "name": name}
   return Response(json.dumps(ret))
 
+@app.route('/suggestion/<name>')
+def suggestion(name):
+  cur = conn.cursor()
+  cur.execute("SELECT data FROM suggestions WHERE name = %s", (name,))
+  data = cur.fetchone()[0]
+  ret = {"data": data}
+  return Response(json.dumps(ret))
+
 @app.route('/submit', methods=["POST"])
 def submit():
   data = request.form['data']

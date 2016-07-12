@@ -16,6 +16,14 @@ if __name__ == "__main__":
     print "downloading", name
     lst.append({"name": name, "data": data, "track": track})
     i += 1
+
+  # support images2 download
+  cur.execute("SELECT * FROM images2")
+  for name, data, track, email, gid in cur.fetchall():
+    print "downloading", name
+    lst.append({"name": name, "data": data, "track": track, "email": email, "gid": gid})
+    i += 1
+
   print "got", i
   st = json.dumps(lst)
   open(OUTFILE, "w").write(st)
