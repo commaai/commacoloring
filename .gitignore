@@ -3,3 +3,6 @@
 .*.swp
 *.pyc
 dump.json
+node_modules
+npm-debug.log
+dummytest

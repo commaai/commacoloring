@@ -1,51 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Adult Coloring Book</title>
-  <link href="css/main.css" rel="stylesheet" type="text/css">
-  <script src="js/jquery.min.js"></script>
-  <script src="js/js.cookie.js"></script>
-  <script>
-  function handleResize() {
-    document.body.style.transform = "scale("+(window.innerWidth/1450.0)+")";
-  }
-  window.onresize = handleResize;
-  window.onload = handleResize;
-  </script>
-</head>
-<body>
-<div class="edit-main-container">
+  <head>
+    <meta charset="utf-8">
+    <title>Adult Coloring Book</title>
 
-<!-- left hand panel -->
-<div class="edit-image-display">
-<div id="lhp"></div>
-<div class="toolchest">
-<img class="tool" id="tool-wand" src="img/wand.png" />
-<img class="tool" id="tool-brush" src="img/brush.png" />
-<img class="tool" id="tool-polygon" src="img/polygon.png" />
-<button class="suggest-button">suggest</button>
-</div>
-<div class="img-submit-box"><button class="img-submit">submit</button></div>
-<div class="edit-image-instructions">color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span>*</div>
-<div class="edit-image-disclaimer">*<span style="color: goldenrod">comma points</span> redeemed to google account. you will get access soon</div>
+    <link href="build/assets/stylesheets/main.css" rel="stylesheet" type="text/css">
 
-<div class="sign-in-box">
-<button class="sign-in">sign in with google</button>
-</div>
-<!--<div class="edit-image-disclaimer">protip: check out the "pixel size" +/-</div>-->
-<div class="edit-image-count"></div>
-</div>
+    <script src="build/assets/javascripts/jquery.min.js"></script>
+    <script src="build/assets/javascripts/js.cookie.js"></script>
 
-<!-- right hand panel -->
-<div class="edit-image-display" id="rhp">
-</div>
+    <script>
+    function handleResize() {
+      document.body.style.transform = "scale("+(window.innerWidth/1450.0)+")";
+    }
+    window.onresize = handleResize;
+    window.onload = handleResize;
+    </script>
+  </head>
+  <body>
+    <div class="edit-main-container">
+      <!-- left hand panel -->
+      <div class="edit-image-display">
+        <div id="lhp"></div>
+        <div class="toolchest">
+          <img class="tool" id="tool-wand" src="build/assets/images/wand.png" />
+          <img class="tool" id="tool-brush" src="build/assets/images/brush.png" />
+          <img class="tool" id="tool-polygon" src="build/assets/images/polygon.png" />
+          <button class="suggest-button">suggest</button>
+        </div>
+        <div class="img-submit-box"><button class="img-submit">submit</button></div>
+        <div class="edit-image-instructions">color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span>*</div>
+        <div class="edit-image-disclaimer">*<span style="color: goldenrod">comma points</span> redeemed to google account. you will get access soon</div>
+        <div class="sign-in-box">
+          <button class="sign-in">sign in with google</button>
+        </div>
+        <div class="edit-image-count"></div>
+      </div>
 
-</div>
-</body>
-<head>
-  <script data-main="js/main.js" src="js/require.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
-</head>
+      <!-- right hand panel -->
+      <div class="edit-image-display" id="rhp"></div>
+    </div>
+
+    <script data-main="build/assets/javascripts/main.js" src="build/assets/javascripts/require.js"></script>
+    <script src="build/assets/javascripts/auth.js"></script>
+    <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
+  </body>
 </html>
-

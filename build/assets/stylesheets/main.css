@@ -1,0 +1,265 @@
+body {
+  transform-origin: top left;
+  width: 1400px;
+}
+
+.segment-viewer-overlay-container {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: black;
+  display: inline-block;
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+.segment-viewer-legend-container {
+  display: inline-block;
+  bottom: 0;
+  position: absolute;
+  right: 0;
+}
+.segment-viewer-legend-item {
+  font-family: monospace;
+  font-size: small;
+  white-space: nowrap;
+}
+.segment-viewer-legend-label {
+  color: gray;
+}
+.segment-viewer-legend-colorbox {
+  background-color: white;
+  border: 1px solid gray;
+  display: inline-block;
+  height: .7em;
+  vertical-align: middle;
+  width: .7em;
+}
+.segment-viewer-container {
+  background-color: gray;
+  display: inline-block;
+  position: relative;
+}
+.segment-viewer-layer {
+  left: 0;
+  position: absolute;
+  top: 0;
+  zoom: 1.0;
+  -moz-transform: scale(1.0);
+}
+.segment-annotator-outer-container {
+  display: inline-block;
+  overflow: auto;
+}
+.segment-annotator-inner-container {
+  background-color: #ccc;
+  position: relative;
+  zoom: 1.0;
+  -moz-transform: scale(1.0);
+  -moz-transform-origin: top left;
+}
+.segment-annotator-layer {
+  left: 0;
+  position: absolute;
+  top: 0;
+  cursor: pointer;
+}
+.edit-sidebar {
+  font-family: monospace;
+}
+.edit-sidebar p {
+  /* font-family: serif; */
+  padding: 0 0.5em;
+  width: 100%;
+}
+.edit-sidebar-button {
+  position: relative;
+  background-color: #eee;
+  cursor: pointer;
+  padding: 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.edit-sidebar-button:hover {
+  background-color: #aaa;
+}
+.edit-sidebar-button-selected,
+.edit-sidebar-button-enabled {
+  background-color: #ccc;
+}
+.edit-sidebar-button-highlight {
+  background-color: #aaa;
+}
+.edit-sidebar-legend-colorbox {
+  background-color: white;
+  border: 1px solid gray;
+  display: inline-block;
+  height: .7em;
+  vertical-align: middle;
+  width: .7em;
+}
+.edit-sidebar-legend-label {
+  color: gray;
+  display: inline-block;
+  width: 15em;
+  padding: 0 0.3em;
+  font-size: 20px;
+}
+.edit-sidebar-legend-label-active {
+  color: black;
+  font-weight: bold;
+}
+.edit-sidebar-popup-trigger {
+  display: inline-block;
+  position: relative;
+  min-width: 1em;
+  text-align: center;
+  background-color: #ddd;
+}
+.edit-sidebar-popup-trigger:hover {
+  background-color: #999;
+}
+.edit-sidebar-popup {
+  display: none;
+  position: absolute;
+  top: 1em;
+  right: 0;
+  padding: 0.1em 0.3em;
+  background-color: #ccc;
+  z-index: 1;
+}
+.edit-sidebar-popup-active {
+  display: block;
+}
+.edit-sidebar-spacer {
+  height: 1em;
+}
+
+.edit-image-instructions {
+  padding: 5px;
+  font-family: monospace;
+  font-size: 20px;
+  max-width: 400px;
+  white-space: normal;
+}
+
+.edit-image-disclaimer {
+  padding: 5px;
+  font-family: monospace;
+  font-size: 10px;
+  max-width: 400px;
+  white-space: normal;
+}
+
+.edit-image-count {
+  padding: 5px;
+  font-family: monospace;
+  font-size: 15px;
+  max-width: 400px;
+  white-space: normal;
+}
+
+.img-submit-box {
+  text-align: center;
+}
+
+.img-submit {
+  padding: 20px;
+  margin: 25px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 20px;
+}
+
+.edit-sidebar-submit {
+  margin-left: 1em;
+}
+.edit-image-top-menu {
+  height: 5em;
+  font-family: monospace;
+}
+.edit-image-top-menu-item {
+  display: inline-block;
+  background-color: #eee;
+  padding: 0 2px;
+  min-width: 1em;
+  text-align: center;
+}
+.edit-image-top-button {
+  display: inline-block;
+  background-color: #eee;
+  cursor: pointer;
+  padding: 0 2px;
+  min-width: 1em;
+  text-align: center;
+  font-size: 20px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.edit-image-top-button:hover {
+  background-color: #aaa;
+}
+.edit-image-top-button-enabled {
+  background-color: #ccc;
+}
+.edit-image-top-spacer {
+  display: inline-block;
+  width: 1em;
+}
+.edit-image-display {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 10px;
+}
+.edit-main-container {
+  white-space: nowrap;
+  width: 1400px;
+}
+.edit-top-menu-block {
+  display: inline-block;
+  margin: 0 .5em;
+}
+.sign-in-box {
+  text-align: center;
+  padding: 10px;
+}
+.sign-in {
+  font-family: monospace;
+}
+.signed-in {
+  font-family: monospace;
+  background-color: #e0e0e0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  color: gray;
+}
+
+.signed-in-email {
+  color: black;
+}
+
+.toolchest {
+  padding-top: 20px;
+  text-align: center;
+}
+
+.tool {
+  width: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding: 5px;
+  height: 50px;
+  background-color: #ffffff;
+  border: 1px solid black;
+}
+.suggest-button {
+  position: relative;
+  top: -28px;
+  margin-left: 8px;
+  width: 62px;
+  height: 62px;
+
+}
+

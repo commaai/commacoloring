@@ -1,0 +1,382 @@
+/** Editor page renderer.
+ */
+define(['../image/layer',
+        '../helper/segment-annotator',
+        '../helper/util'],
+function(Layer, Annotator, util) {
+  // Create the main content block.
+  function createMainDisplay(params, data, annotator) {
+    var annotatorTopMenu = createImageTopMenu(params, data, annotator),
+        sidebar = createSidebar(params, data, annotator);
+
+    var sidebarContainer = $("#lhp")[0];
+    sidebarContainer.appendChild(annotatorTopMenu);
+    sidebarContainer.appendChild(sidebar);
+
+    function tool_select(tool) {
+      $(tool).css("background-color", "#c0c0c0");
+      $(tool).css("border-width", "2px");
+      $(tool).css("margin", "0px");
+    }
+    function tool_deselect(tool) {
+      $(tool).css("background-color", "#FFFFFF");
+      $(tool).css("border-width", "1px");
+      $(tool).css("margin", "1px");
+    }
+
+    // tool selection
+    // TODO: make this not shit
+    $("#tool-wand").click(function(e) {
+      tool_select('#tool-wand');
+      tool_deselect('#tool-brush');
+      tool_deselect('#tool-polygon');
+      annotator._setMode('superpixel');
+    });
+
+    $("#tool-brush").click(function(e) {
+      tool_select('#tool-brush');
+      tool_deselect('#tool-wand');
+      tool_deselect('#tool-polygon');
+      annotator._setMode('brush');
+    });
+
+    $("#tool-polygon").click(function(e) {
+      tool_select('#tool-polygon');
+      tool_deselect('#tool-wand');
+      tool_deselect('#tool-brush');
+      annotator._setMode('polygon');
+    });
+
+    tool_select('#tool-wand');
+    tool_deselect('#tool-brush');
+    tool_deselect('#tool-polygon');
+
+    // set up right panel
+    var annotatorContainer = $("#rhp")[0];
+    annotatorContainer.appendChild(annotator.container);
+
+    var container = $(".edit-main-container")[0];
+
+    if (Cookies.get("track") === undefined) {
+      Cookies.set("track", Math.floor(Math.random() * 10000000));
+    }
+
+    function getCount() {
+      var count = Cookies.get("count");
+      if (count !== undefined) {
+        try {
+          count = parseInt(count);
+        } catch(err) {
+          count = 0;
+        }
+      } else {
+        count = 0;
+      }
+      return count;
+    }
+
+    var count = getCount();
+      $(".edit-image-count").html("you've submitted "+count.toString()+" image"+(count!=1?"s":"")+"."+(count>0?"<br/>keep up the good work!":""));
+    if (count > 0) {
+      $(".edit-image-count")[0].style.color = "#008000";
+    }
+
+    $(".img-submit").click(function() {
+      //open(annotator.export());
+      var percent = annotator.getFilledPercent();
+      if (percent < 0.10) {
+        alert("Please color in the image before clicking submit!");
+      } else {
+        var data = annotator.export();
+        var name = annotator.imageName;
+        $.post("/submit", { data: data, name: name, track: Cookies.get("track"), email: user_email, gid: user_gid }, function() {
+          var count = getCount();
+          count += 1;
+          Cookies.set("count", count.toString());
+          location.reload();
+        });
+      }
+    });
+
+    return container;
+  }
+
+  // Create the menu above the editor.
+  function createImageTopMenu(params, data, annotator) {
+    var container = document.createElement("div"),
+        zoomOutButton = document.createElement("div"),
+        zoomInButton = document.createElement("div"),
+        spacer1 = document.createElement("span"),
+        finerButton = document.createElement("div"),
+        boundaryButton = document.createElement("div"),
+        coarserButton = document.createElement("div"),
+        spacer2 = document.createElement("span"),
+        alphaMinusButton = document.createElement("div"),
+        imageButton = document.createElement("div"),
+        alphaPlusButton = document.createElement("div");
+    zoomOutButton.appendChild(document.createTextNode("-"));
+    zoomOutButton.classList.add("edit-image-top-button");
+    zoomOutButton.addEventListener("click", function () {
+      annotator.zoomOut();
+    });
+    zoomInButton.appendChild(document.createTextNode("zoom +"));
+    zoomInButton.classList.add("edit-image-top-button");
+    zoomInButton.addEventListener("click", function () {
+      annotator.zoomIn();
+    });
+    spacer1.className = "edit-image-top-spacer";
+    boundaryButton.id = "boundary-button";
+    boundaryButton.className = "edit-image-top-button";
+    boundaryButton.appendChild(document.createTextNode("pixel size"));
+    boundaryButton.addEventListener("click", function () {
+      if (boundaryFlashTimeoutID)
+        window.clearTimeout(boundaryFlashTimeoutID);
+      if (boundaryButton.classList.contains("edit-image-top-button-enabled"))
+        annotator.hide("boundary");
+      else
+        annotator.show("boundary");
+      boundaryButton.classList.toggle("edit-image-top-button-enabled");
+    });
+    finerButton.appendChild(document.createTextNode("-"));
+    finerButton.className = "edit-image-top-button";
+    finerButton.addEventListener("click", function () {
+      annotator.finer();
+      boundaryFlash();
+    });
+    coarserButton.appendChild(document.createTextNode("+"));
+    coarserButton.className = "edit-image-top-button";
+    coarserButton.addEventListener("click", function () {
+      annotator.coarser();
+      boundaryFlash();
+    });
+    spacer2.className = "edit-image-top-spacer";
+    alphaMinusButton.className = "edit-image-top-button";
+    alphaMinusButton.appendChild(document.createTextNode("-"));
+    alphaMinusButton.addEventListener("click", function () {
+      annotator.moreAlpha();
+    });
+    imageButton.className = "edit-image-top-button " +
+                            "edit-image-top-button-enabled";
+    imageButton.appendChild(document.createTextNode("brightness"));
+    imageButton.addEventListener("click", function () {
+      if (imageButton.classList.contains("edit-image-top-button-enabled"))
+        annotator.hide("image");
+      else
+        annotator.show("image");
+      imageButton.classList.toggle("edit-image-top-button-enabled");
+    });
+    alphaPlusButton.className = "edit-image-top-button";
+    alphaPlusButton.appendChild(document.createTextNode("+"));
+    alphaPlusButton.addEventListener("click", function () {
+      annotator.lessAlpha();
+    });
+    //
+    container.className = "edit-image-top-menu";
+    //container.appendChild(zoomOutButton);
+    //container.appendChild(zoomInButton);
+    //container.appendChild(spacer1);
+    container.appendChild(finerButton);
+    container.appendChild(boundaryButton);
+    container.appendChild(coarserButton);
+    container.appendChild(spacer2);
+    container.appendChild(alphaMinusButton);
+    container.appendChild(imageButton);
+    container.appendChild(alphaPlusButton);
+    return container;
+  }
+
+  // Set up the automatic flash of boundary.
+  var boundaryFlashTimeoutID = null;
+  function boundaryFlash() {
+    var boundaryButton = document.getElementById("boundary-button");
+    if (boundaryFlashTimeoutID) {
+      window.clearTimeout(boundaryFlashTimeoutID);
+      boundaryFlashTimeoutID = window.setTimeout(function() {
+        boundaryButton.click();
+        boundaryFlashTimeoutID = null;
+      }, 1000);
+    }
+    else if (!boundaryButton.classList.contains(
+             "edit-image-top-button-enabled")) {
+      boundaryButton.click();
+      boundaryFlashTimeoutID = window.setTimeout(function() {
+        boundaryButton.click();
+        boundaryFlashTimeoutID = null;
+      }, 1000);
+    }
+  }
+
+  // Create the sidebar.
+  function createSidebar(params, data, annotator) {
+    var container = document.createElement("div"),
+        labelPicker = createLabelPicker(params, data, annotator);
+    container.className = "edit-sidebar";
+    container.appendChild(labelPicker);
+    return container;
+  }
+
+  function createLabelButton(data, value, index, annotator) {
+    var colorBox = document.createElement("span"),
+        labelText = document.createElement("span"),
+        pickButton = document.createElement("div");
+    colorBox.className = "edit-sidebar-legend-colorbox";
+    colorBox.style.backgroundColor =
+        "rgb(" + data.colormap[index].join(",") + ")";
+    labelText.appendChild(document.createTextNode(value));
+    labelText.className = "edit-sidebar-legend-label";
+    pickButton.appendChild(colorBox);
+    pickButton.appendChild(labelText);
+    pickButton.id = "label-" + index + "-button";
+    pickButton.className = "edit-sidebar-button";
+    pickButton.addEventListener("click", function () {
+      var className = "edit-sidebar-button-selected";
+      annotator.currentLabel = index;
+      var selectedElements = document.getElementsByClassName(className);
+      for (var i = 0; i < selectedElements.length; ++i)
+        selectedElements[i].classList.remove(className);
+      pickButton.classList.add(className);
+    });
+    pickButton.addEventListener('mouseenter', function () {
+      if (!document.getElementsByClassName("edit-sidebar-popup-active").length)
+        annotator.highlightLabel(index);
+    });
+    pickButton.addEventListener('mouseleave', function () {
+      if (!document.getElementsByClassName("edit-sidebar-popup-active").length)
+        annotator.unhighlightLabel();
+    });
+    return pickButton;
+  }
+
+  // Hightlight legend labels.
+  function highlightLabel(label) {
+    var highlightClass = "edit-sidebar-button-highlight",
+        elements = document.getElementsByClassName(highlightClass);
+    for (var i = 0; i < elements.length; ++i)
+      elements[i].classList.remove(highlightClass);
+    var pickButton = document.getElementById("label-" + label + "-button");
+    if (pickButton)
+      pickButton.classList.add(highlightClass);
+  }
+
+  // Create the label picker button.
+  function createLabelPicker(params, data, annotator) {
+    var container = document.createElement("div");
+    container.className = "edit-sidebar-label-picker";
+    for (var i = 0; i < data.labels.length; ++i) {
+      var labelButton = createLabelButton(data, data.labels[i], i, annotator);
+      if (i === 0) {
+        annotator.currentLabel = 0;
+        labelButton.classList.add("edit-sidebar-button-selected");
+      }
+      container.appendChild(labelButton);
+    }
+    window.addEventListener("click", cancelPopup, true);
+    return container;
+  }
+
+  // Cancel popup.
+  function cancelPopup(event) {
+    var isOutsidePopup = true,
+        target = event.target;
+    while (target.parentNode) {
+      isOutsidePopup = isOutsidePopup &&
+                       !target.classList.contains("edit-sidebar-popup");
+      target = target.parentNode;
+    }
+    if (isOutsidePopup) {
+      var popups = document.getElementsByClassName(
+          "edit-sidebar-popup-active");
+      if (popups.length)
+        for (var i = 0; i < popups.length; ++i)
+          popups[i].classList.remove("edit-sidebar-popup-active");
+    }
+  }
+
+  // Create the relabel selector.
+  function createRelabelSelector(data, index, annotator, popupContainer) {
+    var select = document.createElement("select"),
+        firstOption = document.createElement("option");
+    firstOption.appendChild(document.createTextNode("Change to"));
+    select.appendChild(firstOption);
+    for (var i = 0; i < data.labels.length; ++i) {
+      if (i !== index) {
+        var option = document.createElement("option");
+        option.value = i;
+        option.appendChild(document.createTextNode(data.labels[i]));
+        select.appendChild(option);
+      }
+    }
+    select.addEventListener("change", function (event) {
+      var sourceLabel = index;
+      var targetLabel = parseInt(event.target.value, 10);
+      if (sourceLabel !== targetLabel) {
+        var currentLabel = annotator.currentLabel;
+        annotator.currentLabel = targetLabel;
+        annotator.fill(sourceLabel);
+        annotator.currentLabel = currentLabel;
+      }
+      popupContainer.classList.remove("edit-sidebar-popup-active");
+      firstOption.selected = true;
+      event.preventDefault();
+    });
+    return select;
+  }
+
+  // Download trick.
+  function downloadURI(uri, filename) {
+    var anchor = document.createElement("a");
+    anchor.style.display = "none";
+    anchor.target = "_blank"; // Safari doesn't work.
+    anchor.download = filename;
+    anchor.href = uri;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  }
+
+  // Entry point.
+  function render(data, params) {
+    $.getJSON("/sample", function(json) {
+      var annotator = new Annotator(json.data, {
+            width: params.width,
+            height: params.height,
+            colormap: data.colormap,
+            superpixelOptions: { method: "slic", regionSize: 25 },
+            onload: function () {
+              if (data.annotationURLs)
+                annotator.import(data.annotationURLs[id]);
+              annotator.hide("boundary");
+              boundaryFlash();
+            },
+            onchange: function () {
+              var activeLabels = this.getUniqueLabels(),
+                  legendClass = "edit-sidebar-legend-label",
+                  legendActiveClass = "edit-sidebar-legend-label-active",
+                  elements = document.getElementsByClassName(legendClass),
+                  i;
+              for (i = 0; i < elements.length; ++i)
+                elements[i].classList.remove(legendActiveClass);
+              for (i = 0; i < activeLabels.length; ++i)
+                elements[activeLabels[i]].classList.add(legendActiveClass);
+            },
+            onrightclick: function (label) {
+              document.getElementById("label-" + label + "-button").click();
+            },
+            onmousemove: highlightLabel
+          });
+          
+      annotator.imageName = json.name;
+
+      $(".suggest-button").click(function() {
+        if (confirm('Caution, this will replace your work with a suggestion. Okay? If you just submit the suggestion, you will not get comma points.')) {
+          $.getJSON("/suggestion/"+json.name, function(json2) {
+            annotator.setFromURL(json2.data);
+          });
+        }
+      });
+      document.body.appendChild(createMainDisplay(params, data, annotator));
+    });
+  }
+
+  return render;
+});

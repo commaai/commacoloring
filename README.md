@@ -1,5 +1,4 @@
-comma.ai Adult Coloring Book
-============================
+# comma.ai Adult Coloring Book
 
 Use it at https://commacoloring.com/
 
@@ -8,12 +7,11 @@ Thanks Kota Yamaguchi :)
 
 Added a quick Heroku compatible server
 
-Usage
-=====
+## Usage
 
 Local: "heroku local"
 
-Upload to Heroku (free tier is fine) 
+Upload to Heroku (free tier is fine)
 
 To create the tables, run "heroku pg:psql" and
   CREATE TABLE data (name varchar(200), data text)

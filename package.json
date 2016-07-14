@@ -1,0 +1,30 @@
+{
+  "name": "commacoloring",
+  "version": "1.0.0",
+  "description": "comma.ai Adult Coloring Book\r ============================",
+  "main": "gulpfile.babel.js",
+  "scripts": {
+    "dev": "gulp --env debug",
+    "prod": "gulp --env production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Genert/commacoloring.git"
+  },
+  "author": "Genert Org <orggenert@gmail.com> (http://thedeveloper.xyz/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Genert/commacoloring/issues"
+  },
+  "homepage": "https://github.com/Genert/commacoloring#readme",
+  "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-preset-es2015": "^6.9.0",
+    "browser-sync": "^2.13.0",
+    "gulp-imagemin": "^3.0.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-size": "^2.1.0",
+    "rimraf-promise": "^2.0.0",
+    "run-sequence": "^1.2.2"
+  }
+}

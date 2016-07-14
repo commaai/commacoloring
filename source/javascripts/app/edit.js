@@ -8,7 +8,7 @@ function(Layer, Annotator, util) {
   function createMainDisplay(params, data, annotator) {
     var annotatorTopMenu = createImageTopMenu(params, data, annotator),
         sidebar = createSidebar(params, data, annotator);
-    
+
     var sidebarContainer = $("#lhp")[0];
     sidebarContainer.appendChild(annotatorTopMenu);
     sidebarContainer.appendChild(sidebar);
@@ -364,7 +364,9 @@ function(Layer, Annotator, util) {
             },
             onmousemove: highlightLabel
           });
+          
       annotator.imageName = json.name;
+
       $(".suggest-button").click(function() {
         if (confirm('Caution, this will replace your work with a suggestion. Okay? If you just submit the suggestion, you will not get comma points.')) {
           $.getJSON("/suggestion/"+json.name, function(json2) {
@@ -375,7 +377,6 @@ function(Layer, Annotator, util) {
       document.body.appendChild(createMainDisplay(params, data, annotator));
     });
   }
+
   return render;
 });
-
-
