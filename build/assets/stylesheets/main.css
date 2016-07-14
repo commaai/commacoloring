@@ -2,7 +2,6 @@ body {
   transform-origin: top left;
   width: 1400px;
 }
-
 .segment-viewer-overlay-container {
   background-color: rgba(255, 255, 255, 0.5);
   color: black;
@@ -262,4 +261,3 @@ body {
   height: 62px;
 
 }
-
