@@ -1,5 +1,3 @@
-- [X] Sample
-
 *Top priority:*
 - [ ] Slider - pixel size
 - [ ] Slider - brightness
