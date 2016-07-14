@@ -24,7 +24,7 @@ To create the tables, run "heroku pg:psql" and
 Run "tools/uploader.py <paths to png files>" to upload data
 
 ## Front-end Development
-Download latest (NodeJS)[https://nodejs.org/en/].
+Download latest [NodeJS](https://nodejs.org/).
 Open console and navigate to the folder where this repository's code is.
 Run command.
 `
