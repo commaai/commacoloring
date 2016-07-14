@@ -1,6 +1,6 @@
 body {
-  transform-origin: top left;
-  width: 1400px;
+    transform-origin: top left;
+    width: 1400px;
 }
 
 .segment-viewer-overlay-container {
@@ -208,15 +208,21 @@ body {
   display: inline-block;
   width: 1em;
 }
-.edit-image-display {
-  display: inline-block;
-  vertical-align: top;
-  margin-right: 10px;
-}
+
 .edit-main-container {
-  white-space: nowrap;
-  width: 1400px;
+    position: relative;
+    white-space: nowrap;
+    width: 1400px;
 }
+
+.edit-image-display {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 10px;
+    background: #eee;
+}
+
+
 .edit-top-menu-block {
   display: inline-block;
   margin: 0 .5em;
@@ -262,4 +268,3 @@ body {
   height: 62px;
 
 }
-

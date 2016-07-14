@@ -32,7 +32,7 @@ export default {
   },
 
   stylesheets: {
-    entry: path.join(sourceDir, 'stylesheets', '*.{css,scss,sass}'),
+    entry: path.join(sourceDir, 'stylesheets', 'main.{css,scss,sass}'),
     output: path.join(buildDir, 'css')
   },
 

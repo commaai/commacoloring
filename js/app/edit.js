@@ -336,7 +336,7 @@ function(Layer, Annotator, util) {
 
   // Entry point.
   function render(data, params) {
-    $.getJSON("/sample", function(json) {
+    $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function(json) {
       var annotator = new Annotator(json.data, {
             width: params.width,
             height: params.height,
@@ -364,7 +364,7 @@ function(Layer, Annotator, util) {
             },
             onmousemove: highlightLabel
           });
-          
+
       annotator.imageName = json.name;
 
       $(".suggest-button").click(function() {

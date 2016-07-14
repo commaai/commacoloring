@@ -364,7 +364,7 @@ function(Layer, Annotator, util) {
             },
             onmousemove: highlightLabel
           });
-          
+
       annotator.imageName = json.name;
 
       $(".suggest-button").click(function() {

@@ -23,7 +23,9 @@
     "browser-sync": "^2.13.0",
     "gulp-imagemin": "^3.0.1",
     "gulp-plumber": "^1.1.0",
+    "gulp-sass": "^2.3.2",
     "gulp-size": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
     "run-sequence": "^1.2.2"
   }
 }

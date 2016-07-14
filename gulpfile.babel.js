@@ -7,6 +7,8 @@ import $plumber from 'gulp-plumber';
 import $util from 'gulp-util';
 import $size from 'gulp-size';
 import $imagemin from 'gulp-imagemin';
+import $sass from 'gulp-sass';
+import $sourcemaps from 'gulp-sourcemaps';
 
 // Rewrite gulp.src for better error handling.
 var gulpSrc = gulp.src;
@@ -32,6 +34,7 @@ gulp.task('server', () => {
 // Compiles and deploys stylesheets.
 gulp.task('stylesheets', () => {
   return gulp.src(config.stylesheets.entry)
+    .pipe($sass({ outputStyle: 'compressed' }).on('error', $sass.logError))
     .pipe(gulp.dest(config.stylesheets.output))
     .pipe($size({ title: '[stylesheets]', gzip: true }))
     .pipe(browserSync.stream({ match: '**/*.css' }));
