@@ -34,7 +34,7 @@ npm run dev
 This will generate javascript files, stylesheets and optimize images to `build` folder.
 
 ## Folders structure
-`
+```
 - build (Generated content)
   | - assets
     | - javascripts
@@ -52,4 +52,4 @@ This will generate javascript files, stylesheets and optimize images to `build` 
 config.js (Configuration file for NodeJS)
 gulpfile.babel.js (NodeJS front-end tooling)
 index.html
-`
+```
