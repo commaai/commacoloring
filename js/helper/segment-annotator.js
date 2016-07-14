@@ -12,20 +12,23 @@
  *
  * Copyright 2015  Kota Yamaguchi
  */
-define(['../image/layer',
-        '../image/segmentation',
-        '../image/morph'],
-function (Layer, segmentation, morph) {
+define([
+  '../image/layer',
+  '../image/segmentation',
+  '../image/morph'
+], function (Layer, segmentation, morph) {
   // Segment annotator.
   function Annotator(imageURL, options) {
     options = options || {};
+
     if (typeof imageURL !== "string") {
       throw "Invalid imageURL";
     }
+
     this.colormap = options.colormap || [[255, 255, 255], [255, 0, 0]];
     this.boundaryColor = options.boundaryColor || [255, 255, 255];
     this.boundaryAlpha = options.boundaryAlpha || 127;
-    this.visualizationAlpha = options.visualizationAlpha || 144;
+    this.visualizationAlpha = options.visualizationAlpha || (Math.abs(255 / 2));
     this.highlightAlpha = options.highlightAlpha ||
                           Math.min(255, this.visualizationAlpha + 128);
     this.currentZoom = 1.0;
@@ -36,10 +39,12 @@ function (Layer, segmentation, morph) {
     this.onleftclick = options.onleftclick || null;
     this.onhighlight = options.onhighlight || null;
     this.onmousemove = options.onmousemove || null;
+
     this._createLayers(options);
     this._initializeHistory(options);
     this._createLayers(options);
     this._initializeHistory(options);
+
     this.mode = "superpixel";
     this.polygonPoints = [];
     this.prevAnnotationImg = null;
@@ -190,16 +195,18 @@ function (Layer, segmentation, morph) {
   };
 
   Annotator.prototype.setAlpha = function (alpha) {
-    this.visualizationAlpha = Math.max(Math.min(alpha, 255), 0);
+    this.visualizationAlpha = Math.abs(Math.max(Math.min(alpha, 255), 0));
     this.layers.visualization.setAlpha(this.visualizationAlpha).render();
     return this;
   };
 
   Annotator.prototype.lessAlpha = function (scale) {
+    console.log('LESS Alpha', this.visualizationAlpha - (scale || 1) * 20);
     return this.setAlpha(this.visualizationAlpha - (scale || 1) * 20);
   };
 
   Annotator.prototype.moreAlpha = function (scale) {
+    console.log('MORE Alpha', this.visualizationAlpha + (scale || 1) * 20);
     return this.setAlpha(this.visualizationAlpha + (scale || 1) * 20);
   };
 
@@ -288,9 +295,7 @@ function (Layer, segmentation, morph) {
   // Zoom to specific resolution.
   Annotator.prototype.zoom = function (scale) {
     this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
-    this.innerContainer.style.zoom = this.currentZoom;
-    this.innerContainer.style.MozTransform =
-        "scale(" + this.currentZoom + ")";
+    this.innerContainer.style.transform = "scale(" + this.currentZoom + ")";
     return this;
   };
 
@@ -303,19 +308,6 @@ function (Layer, segmentation, morph) {
   Annotator.prototype.zoomOut = function (scale) {
     return this.zoom(this.currentZoom - (scale || 0.25));
   };
-
-  // // Align the current annotation to the boundary of superpixels.
-  // Annotator.prototype.alignBoundary = function () {
-  //   var annotationData = this.layers.annotation.imageData.data;
-  //   for (var i = 0; i < this.pixelIndex.length; ++i) {
-  //     var pixels = this.pixelIndex[i],
-  //         label = _findMostFrequent(annotationData, pixels);
-  //     this._fillPixels(pixels, label);
-  //   }
-  //   this.layers.visualization.render();
-  //   this.history = [];
-  //   this.currentHistoryRecord = 0;
-  // };
 
   Annotator.prototype.denoise = function () {
     var indexImage = morph.decodeIndexImage(this.layers.annotation.imageData),
@@ -739,25 +731,6 @@ function (Layer, segmentation, morph) {
       array[i] = value;
     return array;
   }
-
-  // function _findMostFrequent(annotationData, pixels) {
-  //   var histogram = {},
-  //       j;
-  //   for (j = 0; j < pixels.length; ++j) {
-  //     var label = _getEncodedLabel(annotationData, pixels[j]);
-  //     histogram[label] = (histogram[label]) ? histogram[label] + 1 : 1;
-  //   }
-  //   var maxFrequency = 0,
-  //       majorLabel = 0;
-  //   for (j in histogram) {
-  //     var frequency = histogram[j];
-  //     if (frequency > maxFrequency) {
-  //       maxFrequency = frequency;
-  //       majorLabel = j;
-  //     }
-  //   }
-  //   return majorLabel;
-  // }
 
   function _getEncodedLabel(array, offset) {
     return array[offset] |

@@ -288,6 +288,20 @@ body {
         padding: 0;
         color: #444;
         font-size: 14px;
+        display: inline-block;
+        cursor: pointer;
+        padding: 2px 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+
+        &.active {
+            background: #ccc;
+
+            &:after {
+                content: " (Active)";
+            }
+        }
     }
 
     &__value {
