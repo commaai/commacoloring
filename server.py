@@ -8,17 +8,17 @@ from tools.db import conn
 # set the project root directory as the static folder, you can set others.
 app = Flask(__name__, static_url_path='')
 
-@app.route('/build/assets/javascript/<path:path>')
+@app.route('/js/<path:path>')
 def send_js(path):
-  return send_from_directory('/build/assets/javascript/', path)
+  return send_from_directory('js', path)
 
-@app.route('/build/assets/images/<path:path>')
+@app.route('/img/<path:path>')
 def send_img(path):
-  return send_from_directory('/build/assets/images/', path)
+  return send_from_directory('img', path)
 
-@app.route('/build/assets/stylesheets/<path:path>')
+@app.route('/css/<path:path>')
 def send_css(path):
-  return send_from_directory('/build/assets/stylesheets/', path)
+  return send_from_directory('css', path)
 
 @app.route('/sample')
 def sample():

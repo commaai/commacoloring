@@ -3,7 +3,6 @@ import sequence from 'run-sequence';
 import path from 'path';
 import browserSync from 'browser-sync';
 import gulp from 'gulp';
-import rimraf from 'rimraf-promise';
 import $plumber from 'gulp-plumber';
 import $util from 'gulp-util';
 import $size from 'gulp-size';
@@ -74,10 +73,5 @@ gulp.task('default', () => {
     'watch'
   ];
 
-  rimraf(config.buildDir)
-    .then(() => {
-      sequence(...seq);
-    }, (error) => {
-      throw error;
-    });
+  sequence(...seq);
 });

@@ -24,7 +24,6 @@
     "gulp-imagemin": "^3.0.1",
     "gulp-plumber": "^1.1.0",
     "gulp-size": "^2.1.0",
-    "rimraf-promise": "^2.0.0",
     "run-sequence": "^1.2.2"
   }
 }

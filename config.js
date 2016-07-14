@@ -3,7 +3,7 @@ import { env as $env } from 'gulp-util';
 
 // Common paths used throughout the Gulp pipeline.
 const sourceDir = path.join(__dirname, 'source');
-const buildDir = path.join(__dirname, 'build');
+const buildDir = path.join(__dirname);
 const modulesDir = path.join(__dirname, 'node_modules');
 const developmentServerDir = path.join(__dirname);
 
@@ -23,17 +23,17 @@ export default {
 
   images: {
     entry: path.join(sourceDir, 'images', '**', '*.{jpg,jpeg,gif,png,svg,ico}'),
-    output: path.join(buildDir, 'assets', 'images')
+    output: path.join(buildDir, 'img')
   },
 
   javascripts: {
     entry: path.join(sourceDir, 'javascripts', '**/*.js'),
-    output: path.join(buildDir, 'assets', 'javascripts')
+    output: path.join(buildDir, 'js')
   },
 
   stylesheets: {
     entry: path.join(sourceDir, 'stylesheets', '*.{css,scss,sass}'),
-    output: path.join(buildDir, 'assets', 'stylesheets')
+    output: path.join(buildDir, 'css')
   },
 
   watch: {
