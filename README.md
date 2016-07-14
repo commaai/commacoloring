@@ -35,19 +35,14 @@ This will generate javascript files, stylesheets and optimize images to `build` 
 
 ## Folders structure
 ```
-- build (Generated content)
-  | - assets
-    | - javascripts
-    | - images
-    | - stylesheets
-
+- img
+- css
+- js
 - source (Make changes here)
   | - images
   | - javascripts
   | - stylesheets
-
 - tools
-
 .babelrc (Used for NodeJS)
 config.js (Configuration file for NodeJS)
 gulpfile.babel.js (NodeJS front-end tooling)
