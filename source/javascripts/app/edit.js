@@ -1,13 +1,42 @@
 /** Editor page renderer.
  */
-define(['../image/layer',
-        '../helper/segment-annotator',
-        '../helper/util'],
-function(Layer, Annotator, util) {
+define([
+  '../image/layer',
+  '../helper/segment-annotator',
+  '../helper/util'
+], function(Layer, Annotator, util) {
+  // Create sliders
+  function createSlider (slider) {
+    if (!slider) {
+      return;
+    }
+
+    noUiSlider.create(slider, {
+    	start: [ 4000 ],
+    	step: 1000,
+    	range: {
+    		'min': [  2000 ],
+    		'max': [ 10000 ]
+    	}
+    });
+  }
+
+  function createSlidersFromElements () {
+    var pixelSizeSlider = $('.pixel-size-slider')[0];
+    var brightnessSlider = $('.brightness-slider')[0];
+    var zoomSlider = $('.zoom-slider')[0];
+
+    createSlider(pixelSizeSlider);
+    createSlider(brightnessSlider);
+    createSlider(zoomSlider);
+  }
+
+  createSlidersFromElements();
+
   // Create the main content block.
   function createMainDisplay(params, data, annotator) {
-    var annotatorTopMenu = createImageTopMenu(params, data, annotator),
-        sidebar = createSidebar(params, data, annotator);
+    var annotatorTopMenu = createImageTopMenu(params, data, annotator);
+    var sidebar = createSidebar(params, data, annotator);
 
     var sidebarContainer = $("#lhp")[0];
     sidebarContainer.appendChild(annotatorTopMenu);
@@ -18,6 +47,7 @@ function(Layer, Annotator, util) {
       $(tool).css("border-width", "2px");
       $(tool).css("margin", "0px");
     }
+
     function tool_deselect(tool) {
       $(tool).css("background-color", "#FFFFFF");
       $(tool).css("border-width", "1px");
@@ -338,32 +368,41 @@ function(Layer, Annotator, util) {
   function render(data, params) {
     $.getJSON("/sample", function(json) {
       var annotator = new Annotator(json.data, {
-            width: params.width,
-            height: params.height,
-            colormap: data.colormap,
-            superpixelOptions: { method: "slic", regionSize: 25 },
-            onload: function () {
-              if (data.annotationURLs)
-                annotator.import(data.annotationURLs[id]);
-              annotator.hide("boundary");
-              boundaryFlash();
-            },
-            onchange: function () {
-              var activeLabels = this.getUniqueLabels(),
-                  legendClass = "edit-sidebar-legend-label",
-                  legendActiveClass = "edit-sidebar-legend-label-active",
-                  elements = document.getElementsByClassName(legendClass),
-                  i;
-              for (i = 0; i < elements.length; ++i)
-                elements[i].classList.remove(legendActiveClass);
-              for (i = 0; i < activeLabels.length; ++i)
-                elements[activeLabels[i]].classList.add(legendActiveClass);
-            },
-            onrightclick: function (label) {
-              document.getElementById("label-" + label + "-button").click();
-            },
-            onmousemove: highlightLabel
-          });
+        width: params.width,
+        height: params.height,
+        colormap: data.colormap,
+        superpixelOptions: {
+          method: "slic",
+          regionSize: 25
+        },
+        onload: function () {
+          if (data.annotationURLs) {
+            annotator.import(data.annotationURLs[id]);
+          }
+
+          annotator.hide("boundary");
+          boundaryFlash();
+        },
+        onchange: function () {
+          var activeLabels = this.getUniqueLabels(),
+              legendClass = "edit-sidebar-legend-label",
+              legendActiveClass = "edit-sidebar-legend-label-active",
+              elements = document.getElementsByClassName(legendClass),
+              i;
+
+          for (i = 0; i < elements.length; ++i) {
+            elements[i].classList.remove(legendActiveClass);
+          }
+
+          for (i = 0; i < activeLabels.length; ++i) {
+            elements[activeLabels[i]].classList.add(legendActiveClass);
+          }
+        },
+        onrightclick: function (label) {
+          document.getElementById("label-" + label + "-button").click();
+        },
+        onmousemove: highlightLabel
+      });
 
       annotator.imageName = json.name;
 
@@ -374,6 +413,7 @@ function(Layer, Annotator, util) {
           });
         }
       });
+
       document.body.appendChild(createMainDisplay(params, data, annotator));
     });
   }
