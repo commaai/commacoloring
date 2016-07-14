@@ -99,7 +99,6 @@ define(function() {
     if (typeof options.imageSmoothingEnabled === "undefined")
       options.imageSmoothingEnabled = true;
     context.mozImageSmoothingEnabled = options.imageSmoothingEnabled;
-    context.webkitImageSmoothingEnabled = options.imageSmoothingEnabled;
     context.msImageSmoothingEnabled = options.imageSmoothingEnabled;
     context.imageSmoothingEnabled = options.imageSmoothingEnabled;
   };

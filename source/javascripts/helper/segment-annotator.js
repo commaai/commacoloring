@@ -294,8 +294,29 @@ define([
 
   // Zoom to specific resolution.
   Annotator.prototype.zoom = function (scale) {
+    var originalImage = this.layers.image;
+    var originalImageCanvas = originalImage.canvas;
+    var originalImageData = originalImage.imageData;
+    var context = originalImageCanvas.getContext('2d');
+
+    // Set zoom.
     this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
-    this.innerContainer.style.transform = "scale(" + this.currentZoom + ")";
+
+    console.log(this.currentZoom);
+
+    // Scale canvas.
+    context.drawImage(
+      originalImageCanvas,
+      originalImageCanvas.width / 4, // x
+      originalImageCanvas.height / 4, // y
+      originalImageCanvas.width / 2, // width
+      originalImageCanvas.height / 2, // height
+      0,
+      0,
+      originalImageCanvas.width,
+      originalImageCanvas.height
+    );
+
     return this;
   };
 
@@ -306,7 +327,7 @@ define([
 
   // Zoom out.
   Annotator.prototype.zoomOut = function (scale) {
-    return this.zoom(this.currentZoom - (scale || 0.25));
+    //return this.zoom(this.currentZoom - (scale || 0.25));
   };
 
   Annotator.prototype.denoise = function () {

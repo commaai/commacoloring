@@ -47,6 +47,8 @@ define([
       step: 1,
       value: 5
     }, function (value) {
+      value = Math.abs(value);
+
       pixelSizeValue.text(value);
     });
 
@@ -56,7 +58,7 @@ define([
       step: 5,
       value: 50
     }, function (value) {
-      brightnessValue.text(value + '%');
+      brightnessValue.text(value + ' %');
     });
 
     createSlider(zoomSlider, {
@@ -66,6 +68,7 @@ define([
       value: 1
     }, function (value) {
       zoomValue.text(value);
+      annotator.zoom(value);
     });
 
     // Toggle pixel size.
@@ -93,10 +96,6 @@ define([
         annotator.show("image");
       }
     });
-
-    window.setTimeout(function () {
-      annotator.zoomIn();
-    }, 3000);
   }
 
   // Create the main content block.
@@ -434,6 +433,7 @@ define([
 
   // Entry point.
   function render(data, params) {
+    // Replace with /sample
     $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function(json) {
       var annotator = new Annotator(json.data, {
         width: params.width,
