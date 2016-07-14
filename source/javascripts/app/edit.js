@@ -6,19 +6,25 @@ define([
   '../helper/util'
 ], function(Layer, Annotator, util) {
   // Create sliders
-  function createSlider (slider) {
+  function createSlider (slider, options, callback) {
     if (!slider) {
       return;
     }
 
     noUiSlider.create(slider, {
-    	start: [ 1 ],
-    	step: 1,
+    	start: [ options.value || 1 ],
+    	step: options.step || 1,
     	range: {
-    		'min': [ 0 ],
-    		'max': [ 10 ]
+    		'min': [ options.min || 0 ],
+    		'max': [ options.max || 10 ]
     	}
     });
+
+    if (callback && typeof callback === 'function') {
+      slider.noUiSlider.on('update', function(values, handle) {
+      	callback(values[handle]);
+      });
+    }
   }
 
   function createSlidersFromElements (annotator) {
@@ -29,11 +35,38 @@ define([
     var pixelSizeLabel = $('.pixel-size-label');
     var brightnessLabel = $('.brightness-label');
 
+    var zoomValue = $('.zoom-value');
+    var brightnessValue = $('.brightness-value');
+    var pixelSizeValue = $('.pixel-size-value');
+
     var temporaryElementHolder = null;
 
-    createSlider(pixelSizeSlider);
-    createSlider(brightnessSlider);
-    createSlider(zoomSlider);
+    createSlider(pixelSizeSlider, {
+      min: 1,
+      max: 10,
+      step: 1,
+      value: 5
+    }, function (value) {
+      pixelSizeValue.text(value);
+    });
+
+    createSlider(brightnessSlider, {
+      min: 0,
+      max: 100,
+      step: 5,
+      value: 50
+    }, function (value) {
+      brightnessValue.text(value + '%');
+    });
+
+    createSlider(zoomSlider, {
+      min: 1,
+      max: 3,
+      step: 0.1,
+      value: 1
+    }, function (value) {
+      zoomValue.text(value);
+    });
 
     // Toggle pixel size.
     pixelSizeLabel.on('click', function () {
