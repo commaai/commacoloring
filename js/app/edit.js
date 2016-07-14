@@ -434,7 +434,7 @@ define([
 
   // Entry point.
   function render(data, params) {
-    $.getJSON("/sample", function(json) {
+    $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function(json) {
       var annotator = new Annotator(json.data, {
         width: params.width,
         height: params.height,
