@@ -47,15 +47,16 @@ body {
 }
 .segment-annotator-outer-container {
   display: inline-block;
-  overflow: auto;
+  overflow: hidden;
 }
 .segment-annotator-inner-container {
   background-color: #ccc;
   position: relative;
   zoom: 1.0;
-  -moz-transform: scale(1.0);
-  -moz-transform-origin: top left;
+  transform: scale(1.0);
+  transform-origin: center center;
 }
+
 .segment-annotator-layer {
   left: 0;
   position: absolute;

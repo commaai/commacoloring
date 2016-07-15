@@ -292,7 +292,10 @@ define([
 
   // Zoom to specific resolution.
   Annotator.prototype.zoom = function (scale) {
-    var originalImage = this.layers.image;
+    this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
+    this.innerContainer.style.zoom = this.currentZoom;
+    this.innerContainer.style.MozTransform = "scale(" + this.currentZoom + ")";
+    /*var originalImage = this.layers.image;
     var originalImageCanvas = originalImage.canvas;
     var originalImageData = originalImage.imageData;
     var context = originalImageCanvas.getContext('2d');
@@ -313,7 +316,7 @@ define([
       0,
       originalImageCanvas.width,
       originalImageCanvas.height
-    );
+    );*/
 
     return this;
   };
@@ -345,8 +348,11 @@ define([
     delete options.onload;
     this.container = document.createElement("div");
     this.container.classList.add("segment-annotator-outer-container");
+
     this.innerContainer = document.createElement("div");
     this.innerContainer.classList.add("segment-annotator-inner-container");
+    this.innerContainer.style.overflow = 'hidden';
+
     this.layers = {
       image: new Layer(options),
       superpixel: new Layer(options),

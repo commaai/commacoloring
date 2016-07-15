@@ -55,7 +55,7 @@ define([
 
     var temporaryElementHolder = null;
 
-    // Configuration
+    // Pixel size slider configuration.
     var pixelSizeSliderConfig = {
       min: 1,
       max: 10,
@@ -63,11 +63,20 @@ define([
       value: 5 // default value
     };
 
+    // Brightness slider configuration.
     var brightnessSliderConfig = {
       min: 0,
       max: 100,
       step: 5,
       value: 50
+    };
+
+    // Zoom slider configuration.
+    var zoomSliderConfig = {
+      min: 1,
+      max: 3,
+      step: 0.1,
+      value: 1
     };
 
     // Value holders.
@@ -102,12 +111,7 @@ define([
       });
     });
 
-    createSlider(brightnessSlider, {
-      min: 0,
-      max: 100,
-      step: 5,
-      value: 50
-    }, function (value) {
+    createSlider(brightnessSlider, brightnessSliderConfig, function (value) {
       value = Math.abs(value);
 
       if (value > currentBrightnessValue || value < currentBrightnessValue) {
@@ -131,14 +135,11 @@ define([
       });
     });
 
-    createSlider(zoomSlider, {
-      min: 1,
-      max: 3,
-      step: 0.1,
-      value: 1
-    }, function (value) {
+    createSlider(zoomSlider, zoomSliderConfig, function (value) {
       zoomValue.text(value);
       annotator.zoom(value);
+    }, function (setValue) {
+      
     });
 
     // Toggle pixel size.
