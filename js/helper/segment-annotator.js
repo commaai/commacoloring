@@ -377,7 +377,6 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       return false;
     };
     function updateIfActive(event) {
-      console.log(annotator);
       var offset = annotator._getClickOffset(event),
           superpixelData = annotator.layers.superpixel.imageData.data,
           annotationData = annotator.layers.annotation.imageData.data,
@@ -387,9 +386,16 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       if (annotator.mode === "superpixel") annotator._updateHighlight(pixels);
       if (typeof annotator.onmousemove === "function") annotator.onmousemove.call(annotator, existingLabel);
       if (mousestate.down) {
-        if (mousestate.button == 2 && typeof annotator.onrightclick === "function") {
-          if (annotator.mode === "polygon") annotator._emptyPolygonPoints(); //reset
-          else annotator.onrightclick.call(annotator, existingLabel);
+        if (mousestate.button === 2) {
+          if (annotator.mode === "polygon") {
+            annotator._emptyPolygonPoints(); //reset
+          } else if (annotator.mode === 'superpixel') {
+            annotator._updateAnnotation(pixels, 0);
+          }
+
+          if (typeof annotator.onrightclick === 'function') {
+            annotator.onrightclick.call(annotator, existingLabel);
+          }
         } else {
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);

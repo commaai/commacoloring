@@ -6,7 +6,7 @@
 - [x] Hotkeys - Brightness
 - [ ] Straight line tool w/ variable
 - [ ] Paintbrush tool
-- [ ] Right click erase
+- [x] Right click erase
 
 *Extra:*
 - [ ] Code format
