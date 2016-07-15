@@ -1,3 +1,7 @@
+"use strict";
+
+var auth2 = null;
+
 function p(x) {
   console.log(x);
 }
@@ -26,7 +30,7 @@ function initAuth() {
     auth2.isSignedIn.listen(updateSigninStatus);
     // Handle the initial sign-in state.
 
-    $('.sign-in').click(function(e) {
+    $('.sign-in').click(function (e) {
       updateSigninStatus(auth2.isSignedIn.get());
     });
 
@@ -48,6 +52,5 @@ function fillUserInfo() {
   var basicProfile = auth2.currentUser.get().getBasicProfile();
   user_email = basicProfile.getEmail();
   user_gid = basicProfile.getId();
-  $(".sign-in-box")[0].innerHTML = "<div class='signed-in'>signed in as <span class='signed-in-email'>"+user_email+ "</span></div>";
+  $(".sign-in-box")[0].innerHTML = "<div class='signed-in'>signed in as <span class='signed-in-email'>" + user_email + "</span></div>";
 }
-

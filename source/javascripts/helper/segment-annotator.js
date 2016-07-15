@@ -29,8 +29,7 @@ define([
     this.boundaryColor = options.boundaryColor || [255, 255, 255];
     this.boundaryAlpha = options.boundaryAlpha || 127;
     this.visualizationAlpha = options.visualizationAlpha || (Math.abs(255 / 2));
-    this.highlightAlpha = options.highlightAlpha ||
-                          Math.min(255, this.visualizationAlpha + 128);
+    this.highlightAlpha = options.highlightAlpha || Math.min(255, this.visualizationAlpha + 128);
     this.currentZoom = 1.0;
     this.defaultLabel = options.defaultLabel || 0;
     this.maxHistoryRecord = options.maxHistoryRecord || 10;
@@ -58,8 +57,6 @@ define([
   }
 
   Annotator.prototype.setFromURL = function(imageURL) {
-    //p(this.colormap);
-    //p(imageURL);
     var canvas = document.createElement('canvas');
 
     // set canvas dimensions.
@@ -275,6 +272,8 @@ define([
   Annotator.prototype.highlightLabel = function (label) {
     var pixels = [],
         annotationData = this.layers.annotation.imageData.data;
+
+    console.log(label);
     for (var i = 0; i < annotationData.length; i += 4) {
       var currentLabel = _getEncodedLabel(annotationData, i);
       if (currentLabel === label)
@@ -293,30 +292,11 @@ define([
   // Zoom to specific resolution.
   Annotator.prototype.zoom = function (scale) {
     this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
-    this.innerContainer.style.zoom = this.currentZoom;
-    this.innerContainer.style.MozTransform = "scale(" + this.currentZoom + ")";
-    /*var originalImage = this.layers.image;
-    var originalImageCanvas = originalImage.canvas;
-    var originalImageData = originalImage.imageData;
-    var context = originalImageCanvas.getContext('2d');
 
-    // Set zoom.
-    this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
-
-    console.log(this.currentZoom);
-
-    // Scale canvas.
-    context.drawImage(
-      originalImageCanvas,
-      originalImageCanvas.width / 4, // x
-      originalImageCanvas.height / 4, // y
-      originalImageCanvas.width / 2, // width
-      originalImageCanvas.height / 2, // height
-      0,
-      0,
-      originalImageCanvas.width,
-      originalImageCanvas.height
-    );*/
+    $(this.innerContainer).css({
+      'zoom': this.currentZoom,
+      'transform': 'scale(' + this.currentZoom + ')'
+    });
 
     return this;
   };
@@ -411,6 +391,7 @@ define([
         annotator = this;
     canvas.oncontextmenu = function() { return false; };
     function updateIfActive(event) {
+      console.log(annotator);
       var offset = annotator._getClickOffset(event),
           superpixelData = annotator.layers.superpixel.imageData.data,
           annotationData = annotator.layers.annotation.imageData.data,

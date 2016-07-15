@@ -1,3 +1,7 @@
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 /*!
  * JavaScript Cookie v2.1.2
  * https://github.com/js-cookie/js-cookie
@@ -8,7 +12,7 @@
 ;(function (factory) {
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
-	} else if (typeof exports === 'object') {
+	} else if ((typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') {
 		module.exports = factory();
 	} else {
 		var OldCookies = window.Cookies;
@@ -18,12 +22,12 @@
 			return api;
 		};
 	}
-}(function () {
-	function extend () {
+})(function () {
+	function extend() {
 		var i = 0;
 		var result = {};
 		for (; i < arguments.length; i++) {
-			var attributes = arguments[ i ];
+			var attributes = arguments[i];
 			for (var key in attributes) {
 				result[key] = attributes[key];
 			}
@@ -31,8 +35,8 @@
 		return result;
 	}
 
-	function init (converter) {
-		function api (key, value, attributes) {
+	function init(converter) {
+		function api(key, value, attributes) {
 			var result;
 			if (typeof document === 'undefined') {
 				return;
@@ -59,8 +63,7 @@
 				} catch (e) {}
 
 				if (!converter.write) {
-					value = encodeURIComponent(String(value))
-						.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
+					value = encodeURIComponent(String(value)).replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
 				} else {
 					value = converter.write(value, key);
 				}
@@ -69,13 +72,8 @@
 				key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
 				key = key.replace(/[\(\)]/g, escape);
 
-				return (document.cookie = [
-					key, '=', value,
-					attributes.expires && '; expires=' + attributes.expires.toUTCString(), // use expires attribute, max-age is not supported by IE
-					attributes.path    && '; path=' + attributes.path,
-					attributes.domain  && '; domain=' + attributes.domain,
-					attributes.secure ? '; secure' : ''
-				].join(''));
+				return document.cookie = [key, '=', value, attributes.expires && '; expires=' + attributes.expires.toUTCString(), // use expires attribute, max-age is not supported by IE
+				attributes.path && '; path=' + attributes.path, attributes.domain && '; domain=' + attributes.domain, attributes.secure ? '; secure' : ''].join('');
 			}
 
 			// Read
@@ -101,9 +99,7 @@
 
 				try {
 					var name = parts[0].replace(rdecode, decodeURIComponent);
-					cookie = converter.read ?
-						converter.read(cookie, name) : converter(cookie, name) ||
-						cookie.replace(rdecode, decodeURIComponent);
+					cookie = converter.read ? converter.read(cookie, name) : converter(cookie, name) || cookie.replace(rdecode, decodeURIComponent);
 
 					if (this.json) {
 						try {
@@ -148,4 +144,4 @@
 	}
 
 	return init(function () {});
-}));
+});

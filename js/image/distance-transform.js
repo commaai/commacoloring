@@ -1,3 +1,5 @@
+"use strict";
+
 /** Distance transform implementation based on the following paper.
  *
  * Distance Transforms of Sampled Functions
@@ -6,8 +8,7 @@
  *
  * Copyright 2015  Kota Yamaguchi
  */
-define(["./compat"],
-function (compat) {
+define(["./compat"], function (compat) {
   var INF = 1e20;
 
   function distanceTransform1D(f, n) {
@@ -15,22 +16,20 @@ function (compat) {
         v = new Int32Array(n),
         z = new Float32Array(n + 1),
         k = 0,
-        square = function(x) { return x * x; },
+        square = function square(x) {
+      return x * x;
+    },
         q;
     v[0] = 0;
     z[0] = -INF;
     z[1] = INF;
     for (q = 1; q <= n - 1; ++q) {
-      var s = ((f[q] + square(q)) - (f[v[k]] + square(v[k]))) /
-              (2 * q - 2 * v[k]);
-      if (isNaN(s))
-        throw "NaN error";
+      var s = (f[q] + square(q) - (f[v[k]] + square(v[k]))) / (2 * q - 2 * v[k]);
+      if (isNaN(s)) throw "NaN error";
       while (s <= z[k]) {
         --k;
-        s  = ((f[q] + square(q)) - (f[v[k]] + square(v[k]))) /
-             (2 * q - 2 * v[k]);
-        if (isNaN(s))
-          throw "NaN error";
+        s = (f[q] + square(q) - (f[v[k]] + square(v[k]))) / (2 * q - 2 * v[k]);
+        if (isNaN(s)) throw "NaN error";
       }
       ++k;
       v[k] = q;
@@ -39,9 +38,9 @@ function (compat) {
     }
     k = 0;
     for (q = 0; q <= n - 1; ++q) {
-      while (z[k + 1] < q)
+      while (z[k + 1] < q) {
         k++;
-      d[q] = square(q - v[k]) + f[v[k]];
+      }d[q] = square(q - v[k]) + f[v[k]];
     }
     return d;
   }
@@ -51,26 +50,31 @@ function (compat) {
         height = distanceMap.height,
         data = distanceMap.data,
         f = new Float32Array(Math.max(width, height)),
-        x, y, d;
+        x,
+        y,
+        d;
     // Column transform.
     for (x = 0; x < width; ++x) {
-      for (y = 0; y < height; ++y)
+      for (y = 0; y < height; ++y) {
         f[y] = data[y * width + x];
-      d = distanceTransform1D(f, height);
-      for (y = 0; y < height; ++y)
+      }d = distanceTransform1D(f, height);
+      for (y = 0; y < height; ++y) {
         data[y * width + x] = d[y];
+      }
     }
     // Row transform.
     for (y = 0; y < height; ++y) {
-      for (x = 0; x < width; ++x)
+      for (x = 0; x < width; ++x) {
         f[x] = data[y * width + x];
-      d = distanceTransform1D(f, width);
-      for (x = 0; x < width; ++x)
+      }d = distanceTransform1D(f, width);
+      for (x = 0; x < width; ++x) {
         data[y * width + x] = d[x];
+      }
     }
     // Sqrt.
-    for (x = 0; x < data.length; ++x)
+    for (x = 0; x < data.length; ++x) {
       data[x] = Math.sqrt(data[x]);
+    }
   }
 
   function distanceTransform(intensity, options) {
@@ -80,9 +84,9 @@ function (compat) {
       height: intensity.height,
       data: new Float32Array(intensity.data.length)
     };
-    for (var offset = 0; offset < distanceMap.data.length; ++offset)
-      distanceMap.data[offset] = (intensity.data[offset]) ? 0 : INF;
-    distanceTransform2D(distanceMap);
+    for (var offset = 0; offset < distanceMap.data.length; ++offset) {
+      distanceMap.data[offset] = intensity.data[offset] ? 0 : INF;
+    }distanceTransform2D(distanceMap);
     //if (options.outputRGB)
     //  distanceMap = intensity2rgb(distanceMap);
     return distanceMap;

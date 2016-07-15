@@ -60,7 +60,8 @@ define([
       min: 1,
       max: 10,
       step: 1,
-      value: 5 // default value
+      value: 5, // default value
+      behaviour: 'none'
     };
 
     // Brightness slider configuration.
@@ -68,7 +69,8 @@ define([
       min: 0,
       max: 100,
       step: 5,
-      value: 50
+      value: 50,
+      behaviour: 'none'
     };
 
     // Zoom slider configuration.
@@ -139,7 +141,7 @@ define([
       zoomValue.text(value);
       annotator.zoom(value);
     }, function (setValue) {
-      
+
     });
 
     // Toggle pixel size.
@@ -280,31 +282,41 @@ define([
     var colorBox = document.createElement("span"),
         labelText = document.createElement("span"),
         pickButton = document.createElement("div");
+
     colorBox.className = "edit-sidebar-legend-colorbox";
-    colorBox.style.backgroundColor =
-        "rgb(" + data.colormap[index].join(",") + ")";
+    colorBox.style.backgroundColor = "rgb(" + data.colormap[index].join(",") + ")";
+
     labelText.appendChild(document.createTextNode(value));
+
     labelText.className = "edit-sidebar-legend-label";
+
     pickButton.appendChild(colorBox);
     pickButton.appendChild(labelText);
     pickButton.id = "label-" + index + "-button";
     pickButton.className = "edit-sidebar-button";
+
     pickButton.addEventListener("click", function () {
       var className = "edit-sidebar-button-selected";
-      annotator.currentLabel = index;
       var selectedElements = document.getElementsByClassName(className);
+
+      annotator.currentLabel = index;
+
       for (var i = 0; i < selectedElements.length; ++i)
         selectedElements[i].classList.remove(className);
+
       pickButton.classList.add(className);
     });
+
     pickButton.addEventListener('mouseenter', function () {
       if (!document.getElementsByClassName("edit-sidebar-popup-active").length)
         annotator.highlightLabel(index);
     });
+
     pickButton.addEventListener('mouseleave', function () {
       if (!document.getElementsByClassName("edit-sidebar-popup-active").length)
         annotator.unhighlightLabel();
     });
+
     return pickButton;
   }
 

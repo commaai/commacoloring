@@ -1,3 +1,5 @@
+"use strict";
+
 /** Priority queue based on binary heap.
  *
  * Example: Basic usage.
@@ -19,12 +21,14 @@
 define([], function () {
   function BinaryHeapPriorityQueue(options) {
     options = options || {};
-    this.comparator = options.comparator || function (a, b) { return a - b; };
-    this.data = (options.initialValues) ? options.initialValues.slice(0) : [];
+    this.comparator = options.comparator || function (a, b) {
+      return a - b;
+    };
+    this.data = options.initialValues ? options.initialValues.slice(0) : [];
     this.length = this.data.length;
-    if (this.data.length > 0)
-      for (var i = 1; i <= this.data.length; ++i)
-        this._bubbleUp(i);
+    if (this.data.length > 0) for (var i = 1; i <= this.data.length; ++i) {
+      this._bubbleUp(i);
+    }
   }
 
   BinaryHeapPriorityQueue.prototype.push = function (value) {
@@ -51,15 +55,13 @@ define([], function () {
 
   BinaryHeapPriorityQueue.prototype._bubbleUp = function (i) {
     while (i > 0) {
-      var parent = (i - 1) >>> 1;
+      var parent = i - 1 >>> 1;
       if (this.comparator(this.data[i], this.data[parent]) < 0) {
         var value = this.data[parent];
         this.data[parent] = this.data[i];
         this.data[i] = value;
         i = parent;
-      }
-      else
-        break;
+      } else break;
     }
   };
 
@@ -69,20 +71,14 @@ define([], function () {
       var left = (i << 1) + 1,
           right = left + 1,
           minIndex = i;
-      if (left <= last &&
-          this.comparator(this.data[left], this.data[minIndex]) < 0)
-        minIndex = left;
-      if (right <= last &&
-          this.comparator(this.data[right], this.data[minIndex]) < 0)
-        minIndex = right;
+      if (left <= last && this.comparator(this.data[left], this.data[minIndex]) < 0) minIndex = left;
+      if (right <= last && this.comparator(this.data[right], this.data[minIndex]) < 0) minIndex = right;
       if (minIndex !== i) {
         var value = this.data[minIndex];
         this.data[minIndex] = this.data[i];
         this.data[i] = value;
         i = minIndex;
-      }
-      else
-        break;
+      } else break;
     }
   };
 

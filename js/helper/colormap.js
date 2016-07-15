@@ -1,3 +1,5 @@
+"use strict";
+
 /** Colormap generator.
  *
  * Example:
@@ -11,17 +13,15 @@
  *
  * Copyright 2015  Kota Yamaguchi
  */
-define(function() {
+define(function () {
   var registry = {
-    random: function (options) {
+    random: function random(options) {
       var colormap = [];
-      for (var i = 0; i < options.size; ++i)
-        colormap.push([Math.floor(256 * Math.random()),
-                       Math.floor(256 * Math.random()),
-                       Math.floor(256 * Math.random())]);
-      return colormap;
+      for (var i = 0; i < options.size; ++i) {
+        colormap.push([Math.floor(256 * Math.random()), Math.floor(256 * Math.random()), Math.floor(256 * Math.random())]);
+      }return colormap;
     },
-    gray: function (options) {
+    gray: function gray(options) {
       var colormap = [];
       for (var i = 0; i < options.size; ++i) {
         var intensity = Math.round(255 * i / options.size);
@@ -29,38 +29,34 @@ define(function() {
       }
       return colormap;
     },
-    hsv: function (options) {
+    hsv: function hsv(options) {
       var colormap = [],
-          saturation = (options.saturation === undefined) ?
-              1 : options.saturation;
-      for (var i = 0; i < options.size; ++i)
+          saturation = options.saturation === undefined ? 1 : options.saturation;
+      for (var i = 0; i < options.size; ++i) {
         colormap.push(hsv2rgb(i / options.size, saturation, 1));
-      return colormap;
+      }return colormap;
     },
-    hhsv: function (options) {
+    hhsv: function hhsv(options) {
       var colormap = [],
           depth = options.depth || 2,
           saturationBlocks = [],
           i;
-      for (i = 0; i < depth; ++i)
-        saturationBlocks[i] = 0;
-      for (i = 0; i < options.size; ++i)
-        saturationBlocks[Math.floor(depth * i / options.size)] += 1;
       for (i = 0; i < depth; ++i) {
+        saturationBlocks[i] = 0;
+      }for (i = 0; i < options.size; ++i) {
+        saturationBlocks[Math.floor(depth * i / options.size)] += 1;
+      }for (i = 0; i < depth; ++i) {
         colormap = colormap.concat(registry.hsv({
           size: saturationBlocks[i],
-          saturation: 1 - (i / depth)
+          saturation: 1 - i / depth
         }));
       }
       return colormap;
     },
-    single: function (options) {
+    single: function single(options) {
       var colormap = [];
       for (var i = 0; i < options.size; ++i) {
-        if (i === options.index)
-          colormap.push(options.foreground || [255, 0, 0]);
-        else
-          colormap.push(options.background || [255, 255, 255]);
+        if (i === options.index) colormap.push(options.foreground || [255, 0, 0]);else colormap.push(options.background || [255, 255, 255]);
       }
       return colormap;
     }
@@ -74,16 +70,26 @@ define(function() {
         p = v * (1 - s),
         q = v * (1 - f * s),
         t = v * (1 - (1 - f) * s),
-        r, g, b;
-    switch(i % 6) {
-      case 0: r = v; g = t; b = p; break;
-      case 1: r = q; g = v; b = p; break;
-      case 2: r = p; g = v; b = t; break;
-      case 3: r = p; g = q; b = v; break;
-      case 4: r = t; g = p; b = v; break;
-      case 5: r = v; g = p; b = q; break;
+        r,
+        g,
+        b;
+    switch (i % 6) {
+      case 0:
+        r = v;g = t;b = p;break;
+      case 1:
+        r = q;g = v;b = p;break;
+      case 2:
+        r = p;g = v;b = t;break;
+      case 3:
+        r = p;g = q;b = v;break;
+      case 4:
+        r = t;g = p;b = v;break;
+      case 5:
+        r = v;g = p;b = q;break;
     }
-    return [r, g, b].map(function (x) { return Math.round(x * 255); });
+    return [r, g, b].map(function (x) {
+      return Math.round(x * 255);
+    });
   }
 
   function create(name, options) {

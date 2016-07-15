@@ -1,3 +1,5 @@
+"use strict";
+
 /** Segmentation viewer.
  *
  * var viewer = new Viewer("/path/to/image.jpg", "/path/to/annotation.png", {
@@ -9,7 +11,7 @@
  *
  * Copyright 2015  Kota Yamaguchi
  */
-define(['../image/layer'], function(Layer) {
+define(['../image/layer'], function (Layer) {
   // Segment viewer.
   function Viewer(imageURL, annotationURL, options) {
     if (typeof options === "undefined") options = {};
@@ -20,22 +22,23 @@ define(['../image/layer'], function(Layer) {
     this.layers.image.load(imageURL, {
       width: options.width,
       height: options.height,
-      onload: function () { viewer._initializeIfReady(options); }
+      onload: function onload() {
+        viewer._initializeIfReady(options);
+      }
     });
     this.layers.visualization.load(annotationURL, {
       width: options.width,
       height: options.height,
       imageSmoothingEnabled: false,
-      onload: function () { viewer._initializeIfReady(options); },
+      onload: function onload() {
+        viewer._initializeIfReady(options);
+      },
       onerror: options.onerror
     });
-    if (options.overlay)
-      viewer.addOverlay(options.overlay);
+    if (options.overlay) viewer.addOverlay(options.overlay);
   }
 
-  Viewer.prototype._createLayers = function (imageURL,
-                                             annotationURL,
-                                             options) {
+  Viewer.prototype._createLayers = function (imageURL, annotationURL, options) {
     var onload = options.onload;
     delete options.onload;
     this.container = document.createElement("div");
@@ -69,8 +72,7 @@ define(['../image/layer'], function(Layer) {
   };
 
   Viewer.prototype._initializeIfReady = function (options) {
-    if (--this._unloadedLayers > 0)
-      return;
+    if (--this._unloadedLayers > 0) return;
     this._resizeLayers(options);
     var viewer = this;
     this.layers.visualization.process(function () {
@@ -78,18 +80,16 @@ define(['../image/layer'], function(Layer) {
       this.applyColormap(viewer.colormap);
       this.setAlpha(192);
       this.render();
-      if (viewer.labels)
-        viewer.addLegend(uniqueIndex.filter(function (x) {
-          return (options.excludedLegends || []).indexOf(x) < 0;
-        }));
+      if (viewer.labels) viewer.addLegend(uniqueIndex.filter(function (x) {
+        return (options.excludedLegends || []).indexOf(x) < 0;
+      }));
     });
   };
 
   Viewer.prototype.addOverlay = function (text) {
     var overlayContainer = document.createElement("div");
     overlayContainer.classList.add("segment-viewer-overlay-container");
-    if (text)
-      overlayContainer.appendChild(document.createTextNode(text));
+    if (text) overlayContainer.appendChild(document.createTextNode(text));
     this.container.appendChild(overlayContainer);
   };
 
@@ -98,8 +98,9 @@ define(['../image/layer'], function(Layer) {
         i;
     if (typeof index === "undefined") {
       index = [];
-      for (i = 0; i < this.labels.length; ++i)
+      for (i = 0; i < this.labels.length; ++i) {
         index.push(i);
+      }
     }
     legendContainer.classList.add("segment-viewer-legend-container");
     for (i = 0; i < index.length; ++i) {
@@ -120,14 +121,16 @@ define(['../image/layer'], function(Layer) {
     this.container.appendChild(legendContainer);
   };
 
-  var getUniqueIndex = function (data) {
+  var getUniqueIndex = function getUniqueIndex(data) {
     var uniqueIndex = [];
     for (var i = 0; i < data.length; i += 4) {
       if (uniqueIndex.indexOf(data[i]) < 0) {
         uniqueIndex.push(data[i]);
       }
     }
-    return uniqueIndex.sort(function (a, b) { return a - b; });
+    return uniqueIndex.sort(function (a, b) {
+      return a - b;
+    });
   };
 
   return Viewer;

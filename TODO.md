@@ -1,11 +1,12 @@
 *Top priority:*
 - [x] Slider - pixel size
 - [x] Slider - brightness
-- [ ] Slider - zoom
+- [x] Slider - zoom
 - [x] Hotkeys - Pixel size
 - [x] Hotkeys - Brightness
 - [ ] Straight line tool w/ variable
 - [ ] Paintbrush tool
+- [ ] Right click erase
 
 *Extra:*
 - [ ] Code format

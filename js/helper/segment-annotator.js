@@ -1,3 +1,7 @@
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 /**
  * Segment annotation widget.
  *
@@ -12,11 +16,7 @@
  *
  * Copyright 2015  Kota Yamaguchi
  */
-define([
-  '../image/layer',
-  '../image/segmentation',
-  '../image/morph'
-], function (Layer, segmentation, morph) {
+define(['../image/layer', '../image/segmentation', '../image/morph'], function (Layer, segmentation, morph) {
   // Segment annotator.
   function Annotator(imageURL, options) {
     options = options || {};
@@ -28,9 +28,8 @@ define([
     this.colormap = options.colormap || [[255, 255, 255], [255, 0, 0]];
     this.boundaryColor = options.boundaryColor || [255, 255, 255];
     this.boundaryAlpha = options.boundaryAlpha || 127;
-    this.visualizationAlpha = options.visualizationAlpha || (Math.abs(255 / 2));
-    this.highlightAlpha = options.highlightAlpha ||
-                          Math.min(255, this.visualizationAlpha + 128);
+    this.visualizationAlpha = options.visualizationAlpha || Math.abs(255 / 2);
+    this.highlightAlpha = options.highlightAlpha || Math.min(255, this.visualizationAlpha + 128);
     this.currentZoom = 1.0;
     this.defaultLabel = options.defaultLabel || 0;
     this.maxHistoryRecord = options.maxHistoryRecord || 10;
@@ -52,14 +51,14 @@ define([
     this.layers.image.load(imageURL, {
       width: options.width,
       height: options.height,
-      onload: function () { annotator._initialize(options); },
+      onload: function onload() {
+        annotator._initialize(options);
+      },
       onerror: options.onerror
     });
   }
 
-  Annotator.prototype.setFromURL = function(imageURL) {
-    //p(this.colormap);
-    //p(imageURL);
+  Annotator.prototype.setFromURL = function (imageURL) {
     var canvas = document.createElement('canvas');
 
     // set canvas dimensions.
@@ -68,22 +67,23 @@ define([
     var ctx = canvas.getContext('2d');
     var img = new Image();
     var annotator = this;
-    img.onload = function() {
+    img.onload = function () {
       ctx.drawImage(img, 0, 0);
       var vd = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
       var color_lookup = {};
-      for (var i = 0;i < annotator.colormap.length; i++) {
+      for (var i = 0; i < annotator.colormap.length; i++) {
         var color = _getEncodedLabel(annotator.colormap[i], 0);
         color_lookup[color] = i;
       }
       // black is nothing
       //p(color_lookup);
       p("loaded suggestion");
-      var offsets = [], labels = [];
+      var offsets = [],
+          labels = [];
       for (y = 0; y < canvas.height; y++) {
         for (x = 0; x < canvas.width; x++) {
-          var offset = (x + y*canvas.width)*4;
+          var offset = (x + y * canvas.width) * 4;
           var tc = _getEncodedLabel(vd, offset);
           var lbl = color_lookup[tc];
           if (lbl !== undefined) {
@@ -94,8 +94,7 @@ define([
       }
       annotator._fillPixels(offsets, labels);
       annotator.layers.visualization.render();
-      if (typeof annotator.onchange === "function")
-        annotator.onchange.call(annotator);
+      if (typeof annotator.onchange === "function") annotator.onchange.call(annotator);
     };
     img.src = imageURL;
   };
@@ -104,8 +103,7 @@ define([
   Annotator.prototype.resetSuperpixels = function (options) {
     options = options || {};
     this.layers.superpixel.copy(this.layers.image);
-    this.segmentation = segmentation.create(this.layers.image.imageData,
-                                            options);
+    this.segmentation = segmentation.create(this.layers.image.imageData, options);
     this._updateSuperpixels(options);
     return this;
   };
@@ -126,45 +124,40 @@ define([
 
   // Undo the edit.
   Annotator.prototype.undo = function () {
-    if (this.currentHistoryRecord < 0)
-      return false;
+    if (this.currentHistoryRecord < 0) return false;
     var record = this.history[this.currentHistoryRecord--];
     this._fillPixels(record.pixels, record.prev);
     this.layers.visualization.render();
-    if (typeof this.onchange === "function")
-      this.onchange.call(this);
+    if (typeof this.onchange === "function") this.onchange.call(this);
     return this.currentHistoryRecord < 0;
   };
 
-
   // Redo the edit.
   Annotator.prototype.redo = function () {
-    if (this.currentHistoryRecord >= this.history.length - 1)
-      return false;
+    if (this.currentHistoryRecord >= this.history.length - 1) return false;
     var record = this.history[++this.currentHistoryRecord];
     this._fillPixels(record.pixels, record.next);
     this.layers.visualization.render();
-    if (typeof this.onchange === "function")
-      this.onchange.call(this);
+    if (typeof this.onchange === "function") this.onchange.call(this);
     return this.currentHistoryRecord >= this.history.length;
   };
 
   // Write the brush tool
   Annotator.prototype.brush = function (pos, label) {
-    var offsets = [], labels = [];
+    var offsets = [],
+        labels = [];
     for (var y = -3; y <= 3; y++) {
       for (var x = -3; x <= 3; x++) {
         // it is circle bitches
-        if ((x*x + y*y) > 9) continue;
-        var offset = 4 * ((pos[1]+y) * this.layers.visualization.canvas.width + (pos[0]+x));
+        if (x * x + y * y > 9) continue;
+        var offset = 4 * ((pos[1] + y) * this.layers.visualization.canvas.width + (pos[0] + x));
         offsets.push(offset);
         labels.push(label);
       }
     }
     this._fillPixels(offsets, labels);
     this.layers.visualization.render();
-    if (typeof this.onchange === "function")
-      this.onchange.call(this);
+    if (typeof this.onchange === "function") this.onchange.call(this);
   };
 
   // Get unique labels in the current annotation.
@@ -177,7 +170,9 @@ define([
         uniqueIndex.push(label);
       }
     }
-    return uniqueIndex.sort(function (a, b) { return a - b; });
+    return uniqueIndex.sort(function (a, b) {
+      return a - b;
+    });
   };
 
   // Fill all the pixels assigned the target label or all.
@@ -186,11 +181,9 @@ define([
         annotationData = this.layers.annotation.imageData.data;
     for (var i = 0; i < annotationData.length; i += 4) {
       var label = _getEncodedLabel(annotationData, i);
-      if (label === targetLabel || targetLabel === undefined)
-        pixels.push(i);
+      if (label === targetLabel || targetLabel === undefined) pixels.push(i);
     }
-    if (pixels.length > 0)
-      this._updateAnnotation(pixels, this.currentLabel);
+    if (pixels.length > 0) this._updateAnnotation(pixels, this.currentLabel);
     return this;
   };
 
@@ -213,22 +206,14 @@ define([
     options = options || {};
     var annotator = this;
     this.layers.annotation.load(annotationURL, {
-      onload: function () {
-        if (options.grayscale)
-          this.gray2index();
-        annotator.layers
-                 .visualization
-                 .copy(this)
-                 .applyColormap(annotator.colormap)
-                 .setAlpha(annotator.visualizationAlpha)
-                 .render();
+      onload: function onload() {
+        if (options.grayscale) this.gray2index();
+        annotator.layers.visualization.copy(this).applyColormap(annotator.colormap).setAlpha(annotator.visualizationAlpha).render();
         this.setAlpha(0).render();
         this.history = [];
         this.currentHistoryRecord = -1;
-        if (typeof options.onload === "function")
-          options.onload.call(annotator);
-        if (typeof annotator.onchange === "function")
-          annotator.onchange.call(annotator);
+        if (typeof options.onload === "function") options.onload.call(annotator);
+        if (typeof annotator.onchange === "function") annotator.onchange.call(annotator);
       },
       onerror: options.onerror
     });
@@ -263,22 +248,23 @@ define([
     var tt = 0;
     var dd = 0;
 
-    for (var i = 0; i < data.length; i+= 4) {
-      var pxl = data[i] + data[i+1] + data[i+2];
-      if (pxl != 255*3) tt += 1;
+    for (var i = 0; i < data.length; i += 4) {
+      var pxl = data[i] + data[i + 1] + data[i + 2];
+      if (pxl != 255 * 3) tt += 1;
       dd += 1;
     }
-    return tt*1.0/dd;
-  }
+    return tt * 1.0 / dd;
+  };
 
   // Highlight a specified label.
   Annotator.prototype.highlightLabel = function (label) {
     var pixels = [],
         annotationData = this.layers.annotation.imageData.data;
+
+    console.log(label);
     for (var i = 0; i < annotationData.length; i += 4) {
       var currentLabel = _getEncodedLabel(annotationData, i);
-      if (currentLabel === label)
-        pixels.push(i);
+      if (currentLabel === label) pixels.push(i);
     }
     this._updateHighlight(pixels);
     return this;
@@ -293,30 +279,11 @@ define([
   // Zoom to specific resolution.
   Annotator.prototype.zoom = function (scale) {
     this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
-    this.innerContainer.style.zoom = this.currentZoom;
-    this.innerContainer.style.MozTransform = "scale(" + this.currentZoom + ")";
-    /*var originalImage = this.layers.image;
-    var originalImageCanvas = originalImage.canvas;
-    var originalImageData = originalImage.imageData;
-    var context = originalImageCanvas.getContext('2d');
 
-    // Set zoom.
-    this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
-
-    console.log(this.currentZoom);
-
-    // Scale canvas.
-    context.drawImage(
-      originalImageCanvas,
-      originalImageCanvas.width / 4, // x
-      originalImageCanvas.height / 4, // y
-      originalImageCanvas.width / 2, // width
-      originalImageCanvas.height / 2, // height
-      0,
-      0,
-      originalImageCanvas.width,
-      originalImageCanvas.height
-    );*/
+    $(this.innerContainer).css({
+      'zoom': this.currentZoom,
+      'transform': 'scale(' + this.currentZoom + ')'
+    });
 
     return this;
   };
@@ -335,9 +302,9 @@ define([
     var indexImage = morph.decodeIndexImage(this.layers.annotation.imageData),
         result = morph.maxFilter(indexImage);
     var pixels = new Int32Array(result.data.length);
-    for (var i = 0; i < pixels.length; ++i)
+    for (var i = 0; i < pixels.length; ++i) {
       pixels[i] = 4 * i;
-    this._updateAnnotation(pixels, result.data);
+    }this._updateAnnotation(pixels, result.data);
     return this;
   };
 
@@ -393,41 +360,36 @@ define([
 
   Annotator.prototype._initialize = function (options) {
     options = options || {};
-    if (!options.width)
-      this._resizeLayers(options);
+    if (!options.width) this._resizeLayers(options);
     this._initializeAnnotationLayer();
     this._initializeVisualizationLayer();
     this._initializeEvents();
     this.resetSuperpixels(options.superpixelOptions);
-    if (typeof options.onload === "function")
-      options.onload.call(this);
-    if (typeof this.onchange === "function")
-      this.onchange.call(this);
+    if (typeof options.onload === "function") options.onload.call(this);
+    if (typeof this.onchange === "function") this.onchange.call(this);
   };
 
   Annotator.prototype._initializeEvents = function () {
     var canvas = this.layers.annotation.canvas,
         mousestate = { down: false, button: 0 },
         annotator = this;
-    canvas.oncontextmenu = function() { return false; };
+    canvas.oncontextmenu = function () {
+      return false;
+    };
     function updateIfActive(event) {
+      console.log(annotator);
       var offset = annotator._getClickOffset(event),
           superpixelData = annotator.layers.superpixel.imageData.data,
           annotationData = annotator.layers.annotation.imageData.data,
           superpixelIndex = _getEncodedLabel(superpixelData, offset),
           pixels = annotator.pixelIndex[superpixelIndex],
           existingLabel = _getEncodedLabel(annotationData, offset);
-      if (annotator.mode === "superpixel")
-        annotator._updateHighlight(pixels);
-      if (typeof annotator.onmousemove === "function")
-        annotator.onmousemove.call(annotator, existingLabel);
+      if (annotator.mode === "superpixel") annotator._updateHighlight(pixels);
+      if (typeof annotator.onmousemove === "function") annotator.onmousemove.call(annotator, existingLabel);
       if (mousestate.down) {
-        if (mousestate.button == 2 &&
-            typeof annotator.onrightclick === "function") {
-          if (annotator.mode === "polygon")
-            annotator._emptyPolygonPoints(); //reset
-          else
-            annotator.onrightclick.call(annotator, existingLabel);
+        if (mousestate.button == 2 && typeof annotator.onrightclick === "function") {
+          if (annotator.mode === "polygon") annotator._emptyPolygonPoints(); //reset
+          else annotator.onrightclick.call(annotator, existingLabel);
         } else {
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
@@ -437,13 +399,11 @@ define([
           }
           if (event.button === 0 && annotator.mode === "polygon") {
             annotator._addPolygonPoint(event);
-            if (annotator._checkLineIntersection())
-              annotator._addPolygonToAnnotation();
+            if (annotator._checkLineIntersection()) annotator._addPolygonToAnnotation();
           } else if (annotator.mode === "superpixel") {
             annotator._updateAnnotation(pixels, annotator.currentLabel);
           }
-          if (typeof annotator.onleftclick === "function")
-            annotator.onleftclick.call(annotator, annotator.currentLabel);
+          if (typeof annotator.onleftclick === "function") annotator.onleftclick.call(annotator, annotator.currentLabel);
         }
       }
     }
@@ -463,7 +423,7 @@ define([
       mousestate.down = false;
     });
     //polygon on/off with ctrl-key
-    window.onkeyup = function(e) {
+    window.onkeyup = function (e) {
       /*var key = e.keyCode ? e.keyCode : e.which;
       if (key == 17) {
         if (annotator.mode=="polygon") {
@@ -498,8 +458,7 @@ define([
   Annotator.prototype._initializeVisualizationLayer = function () {
     var layer = this.layers.visualization;
     layer.resize(this.width, this.height);
-    var initialColor = this.colormap[this.defaultLabel]
-                           .concat([this.visualizationAlpha]);
+    var initialColor = this.colormap[this.defaultLabel].concat([this.visualizationAlpha]);
     layer.fill(initialColor);
     layer.render();
   };
@@ -518,10 +477,10 @@ define([
     var pixelIndex = new Array(numSegments),
         data = this.layers.superpixel.imageData.data,
         i;
-    for (i = 0; i < numSegments; ++i)
+    for (i = 0; i < numSegments; ++i) {
       pixelIndex[i] = [];
-    for (i = 0; i < data.length; i += 4) {
-      var index = data[i] | (data[i + 1] << 8) | (data[i + 2] << 16);
+    }for (i = 0; i < data.length; i += 4) {
+      var index = data[i] | data[i + 1] << 8 | data[i + 2] << 16;
       pixelIndex[index].push(i);
     }
     this.currentPixels = null;
@@ -549,9 +508,8 @@ define([
     var canvas = annotator.layers.annotation.canvas,
         ctx = canvas.getContext('2d');
     if (this.polygonPoints.length === 0) {
-        ctx.save();  // remember previous state.
-        annotator.prevAnnotationImg =
-          ctx.getImageData(0, 0, canvas.width, canvas.height);
+      ctx.save(); // remember previous state.
+      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
     // draw.
     ctx.fillStyle = '#FA6900';
@@ -559,9 +517,9 @@ define([
     ctx.lineWidth = 1;
     if (this.polygonPoints.length === 0) {
       ctx.beginPath();
-      ctx.moveTo( x, y);
+      ctx.moveTo(x, y);
     } else {
-      ctx.lineTo( x, y);
+      ctx.lineTo(x, y);
       ctx.stroke();
     }
     this.polygonPoints.push(pos);
@@ -571,8 +529,7 @@ define([
     var annotator = this,
         ctx = annotator.layers.annotation.canvas.getContext('2d');
     ctx.restore();
-    if (annotator.prevAnnotationImg)
-      ctx.putImageData(annotator.prevAnnotationImg,0,0);
+    if (annotator.prevAnnotationImg) ctx.putImageData(annotator.prevAnnotationImg, 0, 0);
     //reset polygon-points
     annotator.polygonPoints = [];
   };
@@ -580,14 +537,15 @@ define([
   Annotator.prototype._addPolygonToAnnotation = function () {
     var annotator = this,
         canvas = document.createElement('canvas'),
-        x, y;
+        x,
+        y;
     // set canvas dimensions.
     canvas.width = annotator.layers.annotation.canvas.width;
     canvas.height = annotator.layers.annotation.canvas.height;
     var ctx = canvas.getContext('2d');
     ctx.fillStyle = "rgba(0, 0, 255, 255)";
     ctx.beginPath();
-    ctx.moveTo(annotator.polygonPoints[0][0],annotator.polygonPoints[0][1]);
+    ctx.moveTo(annotator.polygonPoints[0][0], annotator.polygonPoints[0][1]);
     for (i = 1; i < annotator.polygonPoints.length; ++i) {
       x = annotator.polygonPoints[i][0];
       y = annotator.polygonPoints[i][1];
@@ -604,10 +562,7 @@ define([
     for (x = 0; x < canvas.width; ++x) {
       for (y = 0; y < canvas.height; ++y) {
         var index = (x + y * imageData.width) * 4;
-        if (data[index + 0] == colorToCheck[0] &&
-            data[index + 1] == colorToCheck[1] &&
-            data[index + 2] == colorToCheck[2] &&
-            data[index + 3] == colorToCheck[3]) {
+        if (data[index + 0] == colorToCheck[0] && data[index + 1] == colorToCheck[1] && data[index + 2] == colorToCheck[2] && data[index + 3] == colorToCheck[3]) {
           pixelsPolygon.push(index);
         }
       }
@@ -617,12 +572,13 @@ define([
     annotator._emptyPolygonPoints();
 
     // cause you always click afterward
-    window.setTimeout(function() { annotator._emptyPolygonPoints(); }, 50);
+    window.setTimeout(function () {
+      annotator._emptyPolygonPoints();
+    }, 50);
   };
 
   Annotator.prototype._checkLineIntersection = function () {
-    if (this.polygonPoints.length < 4)
-      return false;
+    if (this.polygonPoints.length < 4) return false;
     var newLineStartX = this.polygonPoints[this.polygonPoints.length - 2][0],
         newLineStartY = this.polygonPoints[this.polygonPoints.length - 2][1],
         newLineEndX = this.polygonPoints[this.polygonPoints.length - 1][0],
@@ -633,19 +589,14 @@ define([
           line1StartY = this.polygonPoints[i - 1][1],
           line1EndX = this.polygonPoints[i][0],
           line1EndY = this.polygonPoints[i][1],
-          denominator =
-            ((newLineEndY - newLineStartY) * (line1EndX - line1StartX)) -
-            ((newLineEndX - newLineStartX) * (line1EndY - line1StartY)),
+          denominator = (newLineEndY - newLineStartY) * (line1EndX - line1StartX) - (newLineEndX - newLineStartX) * (line1EndY - line1StartY),
           a = line1StartY - newLineStartY,
           b = line1StartX - newLineStartX,
-          numerator1 = ((newLineEndX - newLineStartX) * a) -
-                       ((newLineEndY - newLineStartY) * b),
-          numerator2 = ((line1EndX - line1StartX) * a) -
-                       ((line1EndY - line1StartY) * b);
+          numerator1 = (newLineEndX - newLineStartX) * a - (newLineEndY - newLineStartY) * b,
+          numerator2 = (line1EndX - line1StartX) * a - (line1EndY - line1StartY) * b;
       a = numerator1 / denominator;
       b = numerator2 / denominator;
-      if (a > 0 && a < 1 && b > 0 && b < 1)
-        return true;
+      if (a > 0 && a < 1 && b > 0 && b < 1) return true;
     }
     return false;
   };
@@ -680,21 +631,18 @@ define([
           visualizationData[offset + 1] = this.boundaryColor[1];
           visualizationData[offset + 2] = this.boundaryColor[2];
           visualizationData[offset + 3] = this.highlightAlpha;
-        }
-        else {
+        } else {
           visualizationData[offset + 3] = this.highlightAlpha;
         }
       }
     }
     this.layers.visualization.render();
     this.layers.boundary.render();
-    if (typeof this.onhighlight === "function")
-      this.onhighlight.call(this);
+    if (typeof this.onhighlight === "function") this.onhighlight.call(this);
   };
 
   Annotator.prototype._fillPixels = function (pixels, labels) {
-    if (pixels.length !== labels.length)
-      throw "Invalid fill: " + pixels.length + " !== " + labels.length;
+    if (pixels.length !== labels.length) throw "Invalid fill: " + pixels.length + " !== " + labels.length;
     var annotationData = this.layers.annotation.imageData.data,
         visualizationData = this.layers.visualization.imageData.data;
     for (var i = 0; i < pixels.length; ++i) {
@@ -712,23 +660,19 @@ define([
   // Update label.
   Annotator.prototype._updateAnnotation = function (pixels, labels) {
     var updates;
-    labels = (typeof labels === "object") ?
-        labels : _fillArray(new Int32Array(pixels.length), labels);
+    labels = (typeof labels === 'undefined' ? 'undefined' : _typeof(labels)) === "object" ? labels : _fillArray(new Int32Array(pixels.length), labels);
     updates = this._getDifferentialUpdates(pixels, labels);
-    if (updates.pixels.length === 0)
-      return this;
+    if (updates.pixels.length === 0) return this;
     this._updateHistory(updates);
     this._fillPixels(updates.pixels, updates.next);
     this.layers.visualization.render();
-    if (typeof this.onchange === "function")
-      this.onchange.call(this);
+    if (typeof this.onchange === "function") this.onchange.call(this);
     return this;
   };
 
   // Get the differential update of labels.
   Annotator.prototype._getDifferentialUpdates = function (pixels, labels) {
-    if (pixels.length !== labels.length)
-      throw "Invalid labels";
+    if (pixels.length !== labels.length) throw "Invalid labels";
     var annotationData = this.layers.annotation.imageData.data,
         updates = { pixels: [], prev: [], next: [] };
     for (var i = 0; i < pixels.length; ++i) {
@@ -745,28 +689,23 @@ define([
   Annotator.prototype._updateHistory = function (updates) {
     this.history = this.history.slice(0, this.currentHistoryRecord + 1);
     this.history.push(updates);
-    if (this.history.length > this.maxHistoryRecord)
-      this.history = this.history.slice(1, this.history.length);
-    else
-      ++this.currentHistoryRecord;
+    if (this.history.length > this.maxHistoryRecord) this.history = this.history.slice(1, this.history.length);else ++this.currentHistoryRecord;
   };
 
   function _fillArray(array, value) {
-    for (var i = 0; i < array.length; ++i)
+    for (var i = 0; i < array.length; ++i) {
       array[i] = value;
-    return array;
+    }return array;
   }
 
   function _getEncodedLabel(array, offset) {
-    return array[offset] |
-           (array[offset + 1] << 8) |
-           (array[offset + 2] << 16);
+    return array[offset] | array[offset + 1] << 8 | array[offset + 2] << 16;
   }
 
   function _setEncodedLabel(array, offset, label) {
     array[offset + 0] = label & 255;
-    array[offset + 1] = (label >>> 8) & 255;
-    array[offset + 2] = (label >>> 16) & 255;
+    array[offset + 1] = label >>> 8 & 255;
+    array[offset + 2] = label >>> 16 & 255;
     array[offset + 3] = 255;
   }
 

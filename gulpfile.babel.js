@@ -9,6 +9,8 @@ import $size from 'gulp-size';
 import $imagemin from 'gulp-imagemin';
 import $sass from 'gulp-sass';
 import $sourcemaps from 'gulp-sourcemaps';
+import $babel from 'gulp-babel';
+import $autoprefixer from 'gulp-autoprefixer';
 
 // Rewrite gulp.src for better error handling.
 var gulpSrc = gulp.src;
@@ -35,6 +37,7 @@ gulp.task('server', () => {
 gulp.task('stylesheets', () => {
   return gulp.src(config.stylesheets.entry)
     .pipe($sass({ outputStyle: 'compressed' }).on('error', $sass.logError))
+    .pipe($autoprefixer())
     .pipe(gulp.dest(config.stylesheets.output))
     .pipe($size({ title: '[stylesheets]', gzip: true }))
     .pipe(browserSync.stream({ match: '**/*.css' }));
@@ -51,6 +54,7 @@ gulp.task('images', () => {
 // Compiles and deploys javascript files.
 gulp.task('javascripts', () => {
   return gulp.src(config.javascripts.entry)
+    .pipe($babel())
     .pipe(gulp.dest(config.javascripts.output))
     .pipe($size({ title: '[javascripts]', gzip: true }))
     .pipe(browserSync.stream({ match: '**/*.js' }));

@@ -1,4 +1,4 @@
-data = {
+const data = {
   "labels": [
     "eraser",
     "sky",
@@ -20,20 +20,20 @@ requirejs([
   'app/edit',
   'helper/colormap',
   'helper/util'
-], function(editPage, colormap, util) {
+], function (editPage, colormap, util) {
   var params = util.getQueryParams();
 
   // Create a colormap for display. The following is an example.
   function createColormap(label, labels) {
     if (label) {
-      return colormap.create("single", {
+      return colormap.create('single', {
         size: labels.length,
         index: labels.indexOf(label)
       });
     } else {
       return [[255, 255, 255],
        [226, 196, 196],
-       [64, 32, 32]].concat(colormap.create("hsv", {
+       [64, 32, 32]].concat(colormap.create('hsv', {
         size: labels.length - 3
       }));
     }
