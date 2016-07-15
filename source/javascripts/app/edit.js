@@ -5,8 +5,8 @@ define([
   '../helper/segment-annotator',
   '../helper/util'
 ], function(Layer, Annotator, util) {
-  // Create sliders
-  function createSlider (slider, options, callback) {
+  // Create slider element.
+  function createSlider (slider, options, callback, hotkeyCallback) {
     if (!slider) {
       return;
     }
@@ -25,8 +25,22 @@ define([
       	callback(values[handle]);
       });
     }
+
+    if (hotkeyCallback && typeof hotkeyCallback === 'function') {
+      hotkeyCallback(slider.noUiSlider.set);
+    }
   }
 
+  // Automatic flash of boundary.
+  function flashBoundaries (annotator) {
+    annotator.show('boundary');
+
+    window.setTimeout(function () {
+      annotator.hide('boundary');
+    }, 1000);
+  }
+
+  // Creates sliders.
   function createSlidersFromElements (annotator) {
     var pixelSizeSlider = $('.pixel-size-slider')[0];
     var brightnessSlider = $('.brightness-slider')[0];
@@ -41,15 +55,51 @@ define([
 
     var temporaryElementHolder = null;
 
-    createSlider(pixelSizeSlider, {
+    // Configuration
+    var pixelSizeSliderConfig = {
       min: 1,
       max: 10,
       step: 1,
-      value: 5
-    }, function (value) {
+      value: 5 // default value
+    };
+
+    var brightnessSliderConfig = {
+      min: 0,
+      max: 100,
+      step: 5,
+      value: 50
+    };
+
+    // Value holders.
+    var currentPixelSize = pixelSizeSliderConfig.value;
+    var currentBrightnessValue = brightnessSliderConfig.value;
+
+    createSlider(pixelSizeSlider, pixelSizeSliderConfig, function (value) {
       value = Math.abs(value);
 
+      if (value > currentPixelSize) {
+        annotator.coarser();
+        flashBoundaries(annotator);
+      } else if (value < currentPixelSize) {
+        annotator.finer();
+        flashBoundaries(annotator);
+      }
+
+      currentPixelSize = value;
+
       pixelSizeValue.text(value);
+    }, function (setValue) {
+      Mousetrap.bind(['p +'], function () {
+        if ((currentPixelSize + pixelSizeSliderConfig.step) <= pixelSizeSliderConfig.max) {
+          setValue(currentPixelSize + pixelSizeSliderConfig.step);
+        }
+      });
+
+      Mousetrap.bind(['p -'], function () {
+        if ((currentPixelSize - pixelSizeSliderConfig.step) >= pixelSizeSliderConfig.min) {
+          setValue(currentPixelSize - pixelSizeSliderConfig.step);
+        }
+      });
     });
 
     createSlider(brightnessSlider, {
@@ -58,7 +108,27 @@ define([
       step: 5,
       value: 50
     }, function (value) {
+      value = Math.abs(value);
+
+      if (value > currentBrightnessValue || value < currentBrightnessValue) {
+        annotator.setAlpha(value * 2.55);
+      }
+
+      currentBrightnessValue = value;
+
       brightnessValue.text(value + ' %');
+    }, function (setValue) {
+      Mousetrap.bind(['b +'], function () {
+        if ((currentBrightnessValue + brightnessSliderConfig.step) <= brightnessSliderConfig.max) {
+          setValue(currentBrightnessValue + brightnessSliderConfig.step);
+        }
+      });
+
+      Mousetrap.bind(['b -'], function () {
+        if ((currentBrightnessValue - brightnessSliderConfig.step) >= brightnessSliderConfig.min) {
+          setValue(currentBrightnessValue - brightnessSliderConfig.step);
+        }
+      });
     });
 
     createSlider(zoomSlider, {
@@ -77,10 +147,10 @@ define([
 
       if (temporaryElementHolder.hasClass('active')) {
         temporaryElementHolder.removeClass('active');
-        annotator.hide("boundary");
+        annotator.hide('boundary');
       } else {
         temporaryElementHolder.addClass('active');
-        annotator.show("boundary");
+        annotator.show('boundary');
       }
     });
 
@@ -90,23 +160,21 @@ define([
 
       if (temporaryElementHolder.hasClass('active')) {
         temporaryElementHolder.removeClass('active');
-        annotator.hide("image");
+        annotator.hide('image');
       } else {
         temporaryElementHolder.addClass('active');
-        annotator.show("image");
+        annotator.show('image');
       }
     });
   }
 
   // Create the main content block.
   function createMainDisplay(params, data, annotator) {
-    var annotatorTopMenu = createImageTopMenu(params, data, annotator);
     var sidebar = createSidebar(params, data, annotator);
 
     createSlidersFromElements(annotator);
 
     var sidebarContainer = $("#lhp")[0];
-    sidebarContainer.appendChild(annotatorTopMenu);
     sidebarContainer.appendChild(sidebar);
 
     function tool_select(tool) {
@@ -196,111 +264,6 @@ define([
     });
 
     return container;
-  }
-
-  // Create the menu above the editor.
-  function createImageTopMenu(params, data, annotator) {
-    var container = document.createElement("div"),
-        zoomOutButton = document.createElement("div"),
-        zoomInButton = document.createElement("div"),
-        spacer1 = document.createElement("span"),
-        finerButton = document.createElement("div"),
-        boundaryButton = document.createElement("div"),
-        coarserButton = document.createElement("div"),
-        spacer2 = document.createElement("span"),
-        alphaMinusButton = document.createElement("div"),
-        imageButton = document.createElement("div"),
-        alphaPlusButton = document.createElement("div");
-    zoomOutButton.appendChild(document.createTextNode("-"));
-    zoomOutButton.classList.add("edit-image-top-button");
-    zoomOutButton.addEventListener("click", function () {
-      annotator.zoomOut();
-    });
-    zoomInButton.appendChild(document.createTextNode("zoom +"));
-    zoomInButton.classList.add("edit-image-top-button");
-    zoomInButton.addEventListener("click", function () {
-      annotator.zoomIn();
-    });
-    spacer1.className = "edit-image-top-spacer";
-    boundaryButton.id = "boundary-button";
-    boundaryButton.className = "edit-image-top-button";
-    boundaryButton.appendChild(document.createTextNode("pixel size"));
-    boundaryButton.addEventListener("click", function () {
-      if (boundaryFlashTimeoutID)
-        window.clearTimeout(boundaryFlashTimeoutID);
-      if (boundaryButton.classList.contains("edit-image-top-button-enabled"))
-        annotator.hide("boundary");
-      else
-        annotator.show("boundary");
-      boundaryButton.classList.toggle("edit-image-top-button-enabled");
-    });
-    finerButton.appendChild(document.createTextNode("-"));
-    finerButton.className = "edit-image-top-button";
-    finerButton.addEventListener("click", function () {
-      annotator.finer();
-      boundaryFlash();
-    });
-    coarserButton.appendChild(document.createTextNode("+"));
-    coarserButton.className = "edit-image-top-button";
-    coarserButton.addEventListener("click", function () {
-      annotator.coarser();
-      boundaryFlash();
-    });
-    spacer2.className = "edit-image-top-spacer";
-    alphaMinusButton.className = "edit-image-top-button";
-    alphaMinusButton.appendChild(document.createTextNode("-"));
-    alphaMinusButton.addEventListener("click", function () {
-      annotator.moreAlpha();
-    });
-    imageButton.className = "edit-image-top-button " +
-                            "edit-image-top-button-enabled";
-    imageButton.appendChild(document.createTextNode("brightness"));
-    imageButton.addEventListener("click", function () {
-      if (imageButton.classList.contains("edit-image-top-button-enabled"))
-        annotator.hide("image");
-      else
-        annotator.show("image");
-      imageButton.classList.toggle("edit-image-top-button-enabled");
-    });
-    alphaPlusButton.className = "edit-image-top-button";
-    alphaPlusButton.appendChild(document.createTextNode("+"));
-    alphaPlusButton.addEventListener("click", function () {
-      annotator.lessAlpha();
-    });
-    //
-    container.className = "edit-image-top-menu";
-    //container.appendChild(zoomOutButton);
-    //container.appendChild(zoomInButton);
-    //container.appendChild(spacer1);
-    container.appendChild(finerButton);
-    container.appendChild(boundaryButton);
-    container.appendChild(coarserButton);
-    container.appendChild(spacer2);
-    container.appendChild(alphaMinusButton);
-    container.appendChild(imageButton);
-    container.appendChild(alphaPlusButton);
-    return container;
-  }
-
-  // Set up the automatic flash of boundary.
-  var boundaryFlashTimeoutID = null;
-  function boundaryFlash() {
-    var boundaryButton = document.getElementById("boundary-button");
-    if (boundaryFlashTimeoutID) {
-      window.clearTimeout(boundaryFlashTimeoutID);
-      boundaryFlashTimeoutID = window.setTimeout(function() {
-        boundaryButton.click();
-        boundaryFlashTimeoutID = null;
-      }, 1000);
-    }
-    else if (!boundaryButton.classList.contains(
-             "edit-image-top-button-enabled")) {
-      boundaryButton.click();
-      boundaryFlashTimeoutID = window.setTimeout(function() {
-        boundaryButton.click();
-        boundaryFlashTimeoutID = null;
-      }, 1000);
-    }
   }
 
   // Create the sidebar.
@@ -449,7 +412,7 @@ define([
           }
 
           annotator.hide("boundary");
-          boundaryFlash();
+          flashBoundaries(annotator);
         },
         onchange: function () {
           var activeLabels = this.getUniqueLabels(),

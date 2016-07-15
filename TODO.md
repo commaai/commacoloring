@@ -1,9 +1,9 @@
 *Top priority:*
-- [ ] Slider - pixel size
-- [ ] Slider - brightness
+- [x] Slider - pixel size
+- [x] Slider - brightness
 - [ ] Slider - zoom
-- [ ] Hotkeys - Pixel size
-- [ ] Hotkeys - Brightness
+- [x] Hotkeys - Pixel size
+- [x] Hotkeys - Brightness
 - [ ] Straight line tool w/ variable
 - [ ] Paintbrush tool
 

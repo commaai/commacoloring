@@ -201,12 +201,10 @@ define([
   };
 
   Annotator.prototype.lessAlpha = function (scale) {
-    console.log('LESS Alpha', this.visualizationAlpha - (scale || 1) * 20);
     return this.setAlpha(this.visualizationAlpha - (scale || 1) * 20);
   };
 
   Annotator.prototype.moreAlpha = function (scale) {
-    console.log('MORE Alpha', this.visualizationAlpha + (scale || 1) * 20);
     return this.setAlpha(this.visualizationAlpha + (scale || 1) * 20);
   };
 
