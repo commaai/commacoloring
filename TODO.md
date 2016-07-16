@@ -13,4 +13,4 @@
 - [ ] Code format
 - [ ] Optimize javascript
 - [ ] Convert UMD modules to webpack
-- [ ] ES5 to ES6 w/ Babel
+- [x] ES5 to ES6 w/ Babel

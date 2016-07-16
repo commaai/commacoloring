@@ -273,7 +273,6 @@ define([
     var pixels = [],
         annotationData = this.layers.annotation.imageData.data;
 
-    console.log(label);
     for (var i = 0; i < annotationData.length; i += 4) {
       var currentLabel = _getEncodedLabel(annotationData, i);
       if (currentLabel === label)
@@ -389,7 +388,12 @@ define([
     var canvas = this.layers.annotation.canvas,
         mousestate = { down: false, button: 0 },
         annotator = this;
+
+    var isRightClickEraseModeActive = false;
+    var previousLabel = 0;
+
     canvas.oncontextmenu = function() { return false; };
+
     function updateIfActive(event) {
       var offset = annotator._getClickOffset(event),
           superpixelData = annotator.layers.superpixel.imageData.data,
@@ -397,16 +401,29 @@ define([
           superpixelIndex = _getEncodedLabel(superpixelData, offset),
           pixels = annotator.pixelIndex[superpixelIndex],
           existingLabel = _getEncodedLabel(annotationData, offset);
-      if (annotator.mode === "superpixel")
+
+      if (annotator.mode === "superpixel") {
         annotator._updateHighlight(pixels);
-      if (typeof annotator.onmousemove === "function")
+      }
+
+      if (typeof annotator.onmousemove === "function") {
         annotator.onmousemove.call(annotator, existingLabel);
+      }
+
       if (mousestate.down) {
         if (mousestate.button === 2) {
           if (annotator.mode === "polygon") {
             annotator._emptyPolygonPoints(); //reset
           } else if (annotator.mode === 'superpixel') {
-            annotator._updateAnnotation(pixels, 0);
+            isRightClickEraseModeActive = true;
+
+            if (previousLabel !== annotator.currentLabel && annotator.currentLabel !== 0) {
+              previousLabel = annotator.currentLabel;
+            }
+
+            existingLabel = 0;
+
+            annotator._updateAnnotation(pixels, existingLabel);
           }
 
           if (typeof annotator.onrightclick === 'function') {
@@ -415,50 +432,51 @@ define([
         } else {
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
-            //annotator._fillPixels([offset], [annotator.currentLabel]);
-            //var pos = annotator._getClickPos(event);
-            //p(pos);
           }
+
           if (event.button === 0 && annotator.mode === "polygon") {
             annotator._addPolygonPoint(event);
-            if (annotator._checkLineIntersection())
+
+            if (annotator._checkLineIntersection()) {
               annotator._addPolygonToAnnotation();
+            }
           } else if (annotator.mode === "superpixel") {
             annotator._updateAnnotation(pixels, annotator.currentLabel);
           }
-          if (typeof annotator.onleftclick === "function")
+
+          if (typeof annotator.onleftclick === "function") {
             annotator.onleftclick.call(annotator, annotator.currentLabel);
+          }
+        }
+      } else {
+        if (isRightClickEraseModeActive) {
+          isRightClickEraseModeActive = 0;
+          existingLabel = previousLabel;
+
+          annotator.currentLabel = existingLabel;
         }
       }
     }
+
     canvas.addEventListener('mousemove', updateIfActive);
     canvas.addEventListener('mouseup', updateIfActive);
     canvas.addEventListener('mouseleave', function () {
       annotator._updateHighlight(null);
+
       if (typeof annotator.onmousemove === "function") {
         annotator.onmousemove.call(annotator, null);
       }
     });
+
     canvas.addEventListener('mousedown', function (event) {
       mousestate.down = true;
       mousestate.button = event.button;
     });
+
     window.addEventListener('mouseup', function () {
       mousestate.down = false;
+      mousestate.button = 0;
     });
-    //polygon on/off with ctrl-key
-    window.onkeyup = function(e) {
-      /*var key = e.keyCode ? e.keyCode : e.which;
-      if (key == 17) {
-        if (annotator.mode=="polygon") {
-          annotator.mode = "superpixel";
-        } else {
-          annotator.mode = "polygon";
-          annotator._updateHighlight(null);
-        }
-        annotator._emptyPolygonPoints();
-      }*/
-    };
   };
 
   Annotator.prototype._updateBoundaryLayer = function () {
