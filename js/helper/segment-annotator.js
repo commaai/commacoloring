@@ -2,6 +2,8 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 /**
  * Segment annotation widget.
  *
@@ -47,6 +49,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
 
     this.mode = "superpixel";
     this.polygonPoints = [];
+    this.linePoints = [];
     this.prevAnnotationImg = null;
 
     this.layers.image.load(imageURL, {
@@ -154,18 +157,27 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
   Annotator.prototype.brush = function (pos, label) {
     var offsets = [],
         labels = [];
+
     for (var y = -3; y <= 3; y++) {
       for (var x = -3; x <= 3; x++) {
         // it is circle bitches
-        if (x * x + y * y > 9) continue;
+        if (x * x + y * y > 9) {
+          continue;
+        }
+
         var offset = 4 * ((pos[1] + y) * this.layers.visualization.canvas.width + (pos[0] + x));
+
         offsets.push(offset);
         labels.push(label);
       }
     }
+
     this._fillPixels(offsets, labels);
     this.layers.visualization.render();
-    if (typeof this.onchange === "function") this.onchange.call(this);
+
+    if (typeof this.onchange === "function") {
+      this.onchange.call(this);
+    }
   };
 
   // Get unique labels in the current annotation.
@@ -305,16 +317,6 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     return this;
   };
 
-  // Zoom in.
-  Annotator.prototype.zoomIn = function (scale) {
-    return this.zoom(this.currentZoom + (scale || 0.25));
-  };
-
-  // Zoom out.
-  Annotator.prototype.zoomOut = function (scale) {
-    //return this.zoom(this.currentZoom - (scale || 0.25));
-  };
-
   Annotator.prototype.denoise = function () {
     var indexImage = morph.decodeIndexImage(this.layers.annotation.imageData),
         result = morph.maxFilter(indexImage);
@@ -357,6 +359,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
   Annotator.prototype._resizeLayers = function (options) {
     this.width = options.width || this.layers.image.canvas.width;
     this.height = options.height || this.layers.image.canvas.height;
+
     for (var key in this.layers) {
       if (key !== "image") {
         var canvas = this.layers[key].canvas;
@@ -364,6 +367,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
         canvas.height = this.height;
       }
     }
+
     this.innerContainer.style.width = this.width + "px";
     this.innerContainer.style.height = this.height + "px";
     this.container.style.width = this.width + "px";
@@ -375,15 +379,25 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     this.currentHistoryRecord = -1;
   };
 
-  Annotator.prototype._initialize = function (options) {
-    options = options || {};
-    if (!options.width) this._resizeLayers(options);
+  Annotator.prototype._initialize = function () {
+    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+    if (!options.width) {
+      this._resizeLayers(options);
+    }
+
     this._initializeAnnotationLayer();
     this._initializeVisualizationLayer();
     this._initializeEvents();
     this.resetSuperpixels(options.superpixelOptions);
-    if (typeof options.onload === "function") options.onload.call(this);
-    if (typeof this.onchange === "function") this.onchange.call(this);
+
+    if (typeof options.onload === "function") {
+      options.onload.call(this);
+    }
+
+    if (typeof this.onchange === "function") {
+      this.onchange.call(this);
+    }
   };
 
   Annotator.prototype._initializeEvents = function () {
@@ -436,6 +450,10 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
         } else {
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
+          }
+
+          if (annotator.mode === 'line' && event.button === 0) {
+            annotator.line(event, annotator.currentLabel);
           }
 
           if (event.button === 0 && annotator.mode === "polygon") {
@@ -544,6 +562,38 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     return [event.offsetX, event.offsetY];
   };
 
+  Annotator.prototype.line = function (event, label) {
+    var annotator = this;
+    var pos = this._getClickPos(event);
+
+    var _pos = _slicedToArray(pos, 2);
+
+    var x = _pos[0];
+    var y = _pos[1];
+
+    var canvas = annotator.layers.annotation.canvas;
+    var ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#FA6900';
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1;
+
+    if (this.linePoints.length === 0) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+
+      this.linePoints.push(pos);
+    } else {
+      ctx.lineTo(x, y);
+      ctx.closePath();
+      ctx.stroke();
+
+      console.log(pos);
+
+      this.linePoints = [];
+    }
+  };
+
   // polygon tool.
   Annotator.prototype._addPolygonPoint = function (event) {
     var annotator = this,
@@ -551,16 +601,19 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
         x = pos[0],
         y = pos[1];
     //get canvas.
-    var canvas = annotator.layers.annotation.canvas,
-        ctx = canvas.getContext('2d');
+    var canvas = annotator.layers.annotation.canvas;
+    var ctx = canvas.getContext('2d');
+
     if (this.polygonPoints.length === 0) {
-      ctx.save(); // remember previous state.
+      ctx.save();
       annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
+
     // draw.
     ctx.fillStyle = '#FA6900';
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 1;
+
     if (this.polygonPoints.length === 0) {
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -568,6 +621,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       ctx.lineTo(x, y);
       ctx.stroke();
     }
+
     this.polygonPoints.push(pos);
   };
 

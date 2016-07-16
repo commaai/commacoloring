@@ -121,7 +121,7 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
 
       currentBrightnessValue = value;
 
-      brightnessValue.text(value + ' %');
+      brightnessValue.text(value + ' &');
     }, function (setValue) {
       Mousetrap.bind(['b +'], function () {
         if (currentBrightnessValue + brightnessSliderConfig.step <= brightnessSliderConfig.max) {
