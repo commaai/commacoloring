@@ -172,53 +172,48 @@ define([
     });
   }
 
+  // Create toolset bar.
+  function createToolSetbar (annotator) {
+    let currentActiveTool = 0;
+    const selectTool = (tool) => {
+      $(tool).css({
+        'background-color': '#c0c0c0',
+        'border-width': '2px',
+        'margin': '0'
+      });
+    };
+    const deselectTool = (tool) => {
+      $(tool).css({
+        'background-color': '#FFFFFF',
+        'border-width': '1px',
+        'margin': '1px'
+      });
+    };
+    let tools = $('.tool');
+
+    selectTool(tools.get(0));
+
+    tools.on('click', function () {
+      let tool = $(this);
+      let toolName = tool.attr('data-tool');
+
+      if (toolName !== undefined) {
+        deselectTool(tools);
+        selectTool(tool);
+        annotator._setMode(toolName);
+      }
+    });
+  }
+
   // Create the main content block.
   function createMainDisplay(params, data, annotator) {
     var sidebar = createSidebar(params, data, annotator);
 
     createSlidersFromElements(annotator);
+    createToolSetbar(annotator);
 
     var sidebarContainer = $("#lhp")[0];
     sidebarContainer.appendChild(sidebar);
-
-    function tool_select(tool) {
-      $(tool).css("background-color", "#c0c0c0");
-      $(tool).css("border-width", "2px");
-      $(tool).css("margin", "0px");
-    }
-
-    function tool_deselect(tool) {
-      $(tool).css("background-color", "#FFFFFF");
-      $(tool).css("border-width", "1px");
-      $(tool).css("margin", "1px");
-    }
-
-    // tool selection
-    // TODO: make this not shit
-    $("#tool-wand").click(function(e) {
-      tool_select('#tool-wand');
-      tool_deselect('#tool-brush');
-      tool_deselect('#tool-polygon');
-      annotator._setMode('superpixel');
-    });
-
-    $("#tool-brush").click(function(e) {
-      tool_select('#tool-brush');
-      tool_deselect('#tool-wand');
-      tool_deselect('#tool-polygon');
-      annotator._setMode('brush');
-    });
-
-    $("#tool-polygon").click(function(e) {
-      tool_select('#tool-polygon');
-      tool_deselect('#tool-wand');
-      tool_deselect('#tool-brush');
-      annotator._setMode('polygon');
-    });
-
-    tool_select('#tool-wand');
-    tool_deselect('#tool-brush');
-    tool_deselect('#tool-polygon');
 
     // set up right panel
     var annotatorContainer = $("#rhp")[0];

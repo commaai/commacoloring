@@ -592,7 +592,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     ctx.fillStyle = "rgba(0, 0, 255, 255)";
     ctx.beginPath();
     ctx.moveTo(annotator.polygonPoints[0][0], annotator.polygonPoints[0][1]);
-    for (i = 1; i < annotator.polygonPoints.length; ++i) {
+    for (var i = 1; i < annotator.polygonPoints.length; ++i) {
       x = annotator.polygonPoints[i][0];
       y = annotator.polygonPoints[i][1];
       ctx.lineTo(x, y);
@@ -630,7 +630,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
         newLineEndX = this.polygonPoints[this.polygonPoints.length - 1][0],
         newLineEndY = this.polygonPoints[this.polygonPoints.length - 1][1];
 
-    for (i = 1; i < this.polygonPoints.length - 2; ++i) {
+    for (var i = 1; i < this.polygonPoints.length - 2; ++i) {
       var line1StartX = this.polygonPoints[i - 1][0],
           line1StartY = this.polygonPoints[i - 1][1],
           line1EndX = this.polygonPoints[i][0],
