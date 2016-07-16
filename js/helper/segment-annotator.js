@@ -574,11 +574,13 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     var canvas = annotator.layers.annotation.canvas;
     var ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#FA6900';
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 255)';
+    ctx.lineWidth = 3;
 
     if (this.linePoints.length === 0) {
+      ctx.save();
+      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
       ctx.beginPath();
       ctx.moveTo(x, y);
 
@@ -588,10 +590,47 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       ctx.closePath();
       ctx.stroke();
 
-      console.log(pos);
+      this.linePoints.push(pos);
+
+      this._addLineToAnnotator();
 
       this.linePoints = [];
     }
+  };
+
+  Annotator.prototype._addLineToAnnotator = function () {
+    var annotator = this;
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+
+    canvas.width = annotator.layers.annotation.canvas.width;
+    canvas.height = annotator.layers.annotation.canvas.height;
+
+    console.log(annotator.linePoints);
+
+    ctx.fillStyle = "rgba(0, 0, 255, 255)";
+    ctx.beginPath();
+    ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
+    ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
+    ctx.closePath();
+    ctx.stroke();
+
+    var colorToCheck = [0, 255, 255, 255];
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var data = imageData.data;
+    var pixelsLine = [];
+
+    for (var _x3 = 0; _x3 < canvas.width; ++_x3) {
+      for (var _y = 0; _y < canvas.height; ++_y) {
+        var index = (_x3 + _y * imageData.width) * 4;
+
+        if (data[index + 0] == colorToCheck[0] && data[index + 1] == colorToCheck[1] && data[index + 2] == colorToCheck[2] && data[index + 3] == colorToCheck[3]) {
+          pixelsLine.push(index);
+        }
+      }
+    }
+
+    console.log(pixelsLine);
   };
 
   // polygon tool.
@@ -612,7 +651,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     // draw.
     ctx.fillStyle = '#FA6900';
     ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 3;
 
     if (this.polygonPoints.length === 0) {
       ctx.beginPath();

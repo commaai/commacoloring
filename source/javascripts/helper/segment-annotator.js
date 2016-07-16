@@ -574,11 +574,13 @@ define([
     const canvas = annotator.layers.annotation.canvas;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#FA6900';
-    ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 255)';
+    ctx.lineWidth = 3;
 
     if (this.linePoints.length === 0) {
+      ctx.save();
+      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
       ctx.beginPath();
       ctx.moveTo(x, y);
 
@@ -588,10 +590,50 @@ define([
       ctx.closePath();
       ctx.stroke();
 
-      console.log(pos);
+      this.linePoints.push(pos);
+
+      this._addLineToAnnotator();
 
       this.linePoints = [];
     }
+  };
+
+  Annotator.prototype._addLineToAnnotator = function () {
+    const annotator = this;
+    let canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = annotator.layers.annotation.canvas.width;
+    canvas.height = annotator.layers.annotation.canvas.height;
+
+    console.log(annotator.linePoints);
+
+    ctx.fillStyle = "rgba(0, 0, 255, 255)";
+    ctx.beginPath();
+    ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
+    ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
+    ctx.closePath();
+    ctx.stroke();
+
+    const colorToCheck = [0, 255, 255, 255];
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    let pixelsLine = [];
+
+    for (let x = 0; x < canvas.width; ++x) {
+      for (let y = 0; y < canvas.height; ++y) {
+        let index = (x + y * imageData.width) * 4;
+
+        if (data[index + 0] == colorToCheck[0] &&
+            data[index + 1] == colorToCheck[1] &&
+            data[index + 2] == colorToCheck[2] &&
+            data[index + 3] == colorToCheck[3]) {
+          pixelsLine.push(index);
+        }
+      }
+    }
+
+    console.log(pixelsLine);
   };
 
   // polygon tool.
@@ -612,7 +654,7 @@ define([
     // draw.
     ctx.fillStyle = '#FA6900';
     ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 3;
 
     if (this.polygonPoints.length === 0) {
       ctx.beginPath();
