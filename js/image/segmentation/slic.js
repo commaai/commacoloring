@@ -51,7 +51,6 @@ define(["./base", "../compat"], function (BaseSegmentation, compat) {
   SLIC.prototype.finer = function () {
     var newSize = Math.max(5, Math.round(this.regionSize / Math.sqrt(2.0)));
 
-    console.log(newSize);
     if (newSize !== this.regionSize) {
       this.regionSize = newSize;
       this.minRegionSize = Math.round(newSize * 0.8);
@@ -61,7 +60,7 @@ define(["./base", "../compat"], function (BaseSegmentation, compat) {
 
   SLIC.prototype.coarser = function () {
     var newSize = Math.min(640, Math.round(this.regionSize * Math.sqrt(2.0)));
-    console.log(newSize);
+
     if (newSize !== this.regionSize) {
       this.regionSize = newSize;
       this.minRegionSize = Math.round(newSize * 0.8);

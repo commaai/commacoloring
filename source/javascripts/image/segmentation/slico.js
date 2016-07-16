@@ -13,19 +13,18 @@
 define(["./base",
         "../compat"],
 function(BaseSegmentation, compat) {
-  function SLICO(imageData, options) {
+  function SLICO(imageData, options = {}) {
     BaseSegmentation.call(this, imageData, options);
+
     this.width  = this.imageData.width;
     this.height = this.imageData.height;
-    options = options || {};
     this.method = options.method || "FixedK";
-    this.perturb = (typeof options.perturb === "undefined") ?
-            true : options.perturb;
+    this.perturb = (typeof options.perturb === "undefined") ? true : options.perturb;
     this.maxIterations = options.maxIterations || 10;
     this.K = options.K || 1024;
     this.step = options.step || 200;
-    this.enforceConnectivity = (options.enforceConnectivity === false) ?
-                                false : true;
+    this.enforceConnectivity = (options.enforceConnectivity === false) ? false : true;
+    
     this._compute();
   }
 

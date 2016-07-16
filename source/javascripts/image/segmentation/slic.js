@@ -27,7 +27,7 @@ define([
   // SLIC segmentation.
   function SLIC(imageData, options = {}) {
     BaseSegmentation.call(this, imageData, options);
-    
+
     this.regionSize = options.regionSize || 55;
     this.minRegionSize = options.minRegionSize || Math.round(this.regionSize * 0.8);
     this.maxIterations = options.maxIterations || 10;
@@ -48,7 +48,6 @@ define([
   SLIC.prototype.finer = function () {
     var newSize = Math.max(5, Math.round(this.regionSize / Math.sqrt(2.0)));
 
-    console.log(newSize);
     if (newSize !== this.regionSize) {
       this.regionSize = newSize;
       this.minRegionSize = Math.round(newSize * 0.8);
@@ -58,7 +57,7 @@ define([
 
   SLIC.prototype.coarser = function () {
     var newSize = Math.min(640, Math.round(this.regionSize * Math.sqrt(2.0)));
-    console.log(newSize);
+
     if (newSize !== this.regionSize) {
       this.regionSize = newSize;
       this.minRegionSize = Math.round(newSize * 0.8);
