@@ -18,10 +18,15 @@ define(["./segmentation/pff", "./segmentation/slic", "./segmentation/slico", "./
     watershed: watershed
   };
 
-  methods.create = function (imageData, options) {
-    options = options || {};
+  methods.create = function (imageData) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
     options.method = options.method || "slic";
-    if (!methods[options.method]) throw "Invalid method: " + options.method;
+
+    if (!methods[options.method]) {
+      throw "Invalid method: " + options.method;
+    }
+
     return new methods[options.method](imageData, options);
   };
 

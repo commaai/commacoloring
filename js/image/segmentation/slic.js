@@ -24,19 +24,34 @@
  */
 define(["./base", "../compat"], function (BaseSegmentation, compat) {
   // SLIC segmentation.
-  function SLIC(imageData, options) {
+  function SLIC(imageData) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
     BaseSegmentation.call(this, imageData, options);
-    options = options || {};
-    this.regionSize = options.regionSize || 16;
+
+    this.regionSize = options.regionSize || 55;
     this.minRegionSize = options.minRegionSize || Math.round(this.regionSize * 0.8);
     this.maxIterations = options.maxIterations || 10;
+
     this._compute();
   }
 
   SLIC.prototype = Object.create(BaseSegmentation.prototype);
 
+  SLIC.prototype.setPixelSize = function () {
+    var size = arguments.length <= 0 || arguments[0] === undefined ? this.regionSize : arguments[0];
+
+    if (size !== this.regionSize) {
+      this.regionSize = size;
+      this.minRegionSize = Math.round(size * 0.8);
+      this._compute();
+    }
+  };
+
   SLIC.prototype.finer = function () {
     var newSize = Math.max(5, Math.round(this.regionSize / Math.sqrt(2.0)));
+
+    console.log(newSize);
     if (newSize !== this.regionSize) {
       this.regionSize = newSize;
       this.minRegionSize = Math.round(newSize * 0.8);
@@ -46,6 +61,7 @@ define(["./base", "../compat"], function (BaseSegmentation, compat) {
 
   SLIC.prototype.coarser = function () {
     var newSize = Math.min(640, Math.round(this.regionSize * Math.sqrt(2.0)));
+    console.log(newSize);
     if (newSize !== this.regionSize) {
       this.regionSize = newSize;
       this.minRegionSize = Math.round(newSize * 0.8);
@@ -387,13 +403,6 @@ define(["./base", "../compat"], function (BaseSegmentation, compat) {
     encodeLabels(segmentation, result.data);
     return result;
   }
-
-  // function max(array) {
-  //   var value = array[0];
-  //   for (var i = 0; i < array.length; ++i)
-  //     value = Math.max(array[i], value);
-  //   return value;
-  // }
 
   return SLIC;
 });

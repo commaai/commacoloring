@@ -33,6 +33,10 @@ define([
 
   // Automatic flash of boundary.
   function flashBoundaries (annotator) {
+    if (annotator.isLayerShown('boundary') === true) {
+      return;
+    }
+
     annotator.show('boundary');
 
     window.setTimeout(function () {
@@ -57,10 +61,10 @@ define([
 
     // Pixel size slider configuration.
     var pixelSizeSliderConfig = {
-      min: 1,
-      max: 10,
-      step: 1,
-      value: 5, // default value
+      min: 11,
+      max: 110,
+      step: 11,
+      value: 55, // default value
       behaviour: 'none'
     };
 
@@ -88,17 +92,14 @@ define([
     createSlider(pixelSizeSlider, pixelSizeSliderConfig, function (value) {
       value = Math.abs(value);
 
-      if (value > currentPixelSize) {
-        annotator.coarser();
-        flashBoundaries(annotator);
-      } else if (value < currentPixelSize) {
-        annotator.finer();
+      if (value > currentPixelSize || value < currentPixelSize) {
+        annotator.setPixelSize(value);
         flashBoundaries(annotator);
       }
 
       currentPixelSize = value;
 
-      pixelSizeValue.text(value);
+      pixelSizeValue.text(value / pixelSizeSliderConfig.step);
     }, function (setValue) {
       Mousetrap.bind(['p +'], function () {
         if ((currentPixelSize + pixelSizeSliderConfig.step) <= pixelSizeSliderConfig.max) {

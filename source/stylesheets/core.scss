@@ -52,8 +52,10 @@ body {
 .segment-annotator-inner-container {
   background-color: #ccc;
   position: relative;
-  zoom: 1.0;
   transform: scale(1.0);
+  -webkit-transform-origin: center center;
+  -moz-transform-origin: center center;
+  -ms-transform-origin: center center;
   transform-origin: center center;
 }
 

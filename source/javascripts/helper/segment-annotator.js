@@ -17,10 +17,7 @@ define([
   '../image/segmentation',
   '../image/morph'
 ], function (Layer, segmentation, morph) {
-  // Segment annotator.
-  function Annotator(imageURL, options) {
-    options = options || {};
-
+  function Annotator(imageURL, options = {}) {
     if (typeof imageURL !== "string") {
       throw "Invalid imageURL";
     }
@@ -47,11 +44,13 @@ define([
     this.mode = "superpixel";
     this.polygonPoints = [];
     this.prevAnnotationImg = null;
-    var annotator = this;
+
     this.layers.image.load(imageURL, {
       width: options.width,
       height: options.height,
-      onload: function () { annotator._initialize(options); },
+      onload: () => {
+        this._initialize(options);
+      },
       onerror: options.onerror
     });
   }
@@ -103,6 +102,13 @@ define([
     this.layers.superpixel.copy(this.layers.image);
     this.segmentation = segmentation.create(this.layers.image.imageData,
                                             options);
+    this._updateSuperpixels(options);
+    return this;
+  };
+
+  // Set specifig superpixel resolution.
+  Annotator.prototype.setPixelSize = function (size, options) {
+    this.segmentation.setPixelSize(size);
     this._updateSuperpixels(options);
     return this;
   };
@@ -242,6 +248,17 @@ define([
     return data;
   };
 
+  // Show if specified layer is shown or hidden.
+  Annotator.prototype.isLayerShown = function (layer) {
+    const displayValue = this.layers[layer].canvas.style.display;
+
+    if (displayValue === 'inline-block' || displayValue === 'block') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // Show a specified layer.
   Annotator.prototype.show = function (layer) {
     this.layers[layer].canvas.style.display = "inline-block";
@@ -293,7 +310,6 @@ define([
     this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
 
     $(this.innerContainer).css({
-      'zoom': this.currentZoom,
       'transform': 'scale(' + this.currentZoom + ')'
     });
 
