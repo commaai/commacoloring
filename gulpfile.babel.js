@@ -11,6 +11,7 @@ import $sass from 'gulp-sass';
 import $sourcemaps from 'gulp-sourcemaps';
 import $babel from 'gulp-babel';
 import $autoprefixer from 'gulp-autoprefixer';
+import $cached from 'gulp-cached';
 
 // Rewrite gulp.src for better error handling.
 var gulpSrc = gulp.src;
@@ -54,6 +55,7 @@ gulp.task('images', () => {
 // Compiles and deploys javascript files.
 gulp.task('javascripts', () => {
   return gulp.src(config.javascripts.entry)
+    .pipe($cached('js'))
     .pipe($babel())
     .pipe(gulp.dest(config.javascripts.output))
     .pipe($size({ title: '[javascripts]', gzip: true }))

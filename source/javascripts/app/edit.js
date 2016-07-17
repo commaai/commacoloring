@@ -123,7 +123,7 @@ define([
 
       currentBrightnessValue = value;
 
-      brightnessValue.text(`${value} &`);
+      brightnessValue.text(`${value} %`);
     }, function (setValue) {
       Mousetrap.bind(['b +'], function () {
         if ((currentBrightnessValue + brightnessSliderConfig.step) <= brightnessSliderConfig.max) {

@@ -389,6 +389,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     this._initializeAnnotationLayer();
     this._initializeVisualizationLayer();
     this._initializeEvents();
+
     this.resetSuperpixels(options.superpixelOptions);
 
     if (typeof options.onload === "function") {
@@ -593,8 +594,6 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       this.linePoints.push(pos);
 
       this._addLineToAnnotator();
-
-      this.linePoints = [];
     }
   };
 
@@ -602,20 +601,20 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     var annotator = this;
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
+    var lineColor = [255, 255, 255, 255]; // Black
 
     canvas.width = annotator.layers.annotation.canvas.width;
     canvas.height = annotator.layers.annotation.canvas.height;
 
-    console.log(annotator.linePoints);
-
-    ctx.fillStyle = "rgba(0, 0, 255, 255)";
+    ctx.strokeStyle = 'rgba(' + lineColor[0] + ', ' + lineColor[1] + ', ' + lineColor[2] + ', ' + lineColor[3] + ')';
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
     ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
     ctx.closePath();
     ctx.stroke();
 
-    var colorToCheck = [0, 255, 255, 255];
+    var colorToCheck = lineColor;
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     var data = imageData.data;
     var pixelsLine = [];
@@ -630,7 +629,26 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       }
     }
 
+    annotator._updateAnnotation(pixelsLine, annotator.currentLabel);
+    annotator._emptyLines();
+
+    /*var w=window.open('about:blank','image from canvas');
+    w.document.write("<img src='"+canvas.toDataURL("image/png")+"' alt='from canvas'/>");*/
+
     console.log(pixelsLine);
+  };
+
+  Annotator.prototype._emptyLines = function () {
+    var annotator = this;
+    var ctx = annotator.layers.annotation.canvas.getContext('2d');
+
+    ctx.restore();
+
+    if (annotator.prevAnnotationImg) {
+      ctx.putImageData(annotator.prevAnnotationImg, 0, 0);
+    }
+
+    this.linePoints = [];
   };
 
   // polygon tool.

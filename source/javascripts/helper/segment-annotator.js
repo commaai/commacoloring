@@ -319,7 +319,7 @@ define([
     this.currentZoom = Math.max(Math.min(scale || 1.0, 10.0), 1.0);
 
     $(this.innerContainer).css({
-      'transform': 'scale(' + this.currentZoom + ')'
+      'transform': `scale(${this.currentZoom})`
     });
 
     return this;
@@ -395,6 +395,7 @@ define([
     this._initializeAnnotationLayer();
     this._initializeVisualizationLayer();
     this._initializeEvents();
+
     this.resetSuperpixels(options.superpixelOptions);
 
     if (typeof options.onload === "function") {
@@ -593,29 +594,27 @@ define([
       this.linePoints.push(pos);
 
       this._addLineToAnnotator();
-
-      this.linePoints = [];
     }
   };
 
   Annotator.prototype._addLineToAnnotator = function () {
     const annotator = this;
-    let canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    const lineColor = [255, 255, 255, 255]; // Black
 
     canvas.width = annotator.layers.annotation.canvas.width;
     canvas.height = annotator.layers.annotation.canvas.height;
 
-    console.log(annotator.linePoints);
-
-    ctx.fillStyle = "rgba(0, 0, 255, 255)";
+    ctx.strokeStyle = `rgba(${lineColor[0]}, ${lineColor[1]}, ${lineColor[2]}, ${lineColor[3]})`;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
     ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
     ctx.closePath();
     ctx.stroke();
 
-    const colorToCheck = [0, 255, 255, 255];
+    const colorToCheck = lineColor;
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
     let pixelsLine = [];
@@ -633,7 +632,26 @@ define([
       }
     }
 
+    annotator._updateAnnotation(pixelsLine, annotator.currentLabel);
+    annotator._emptyLines();
+
+    /*var w=window.open('about:blank','image from canvas');
+    w.document.write("<img src='"+canvas.toDataURL("image/png")+"' alt='from canvas'/>");*/
+
     console.log(pixelsLine);
+  };
+
+  Annotator.prototype._emptyLines = function () {
+    const annotator = this;
+    const ctx = annotator.layers.annotation.canvas.getContext('2d');
+
+    ctx.restore();
+
+    if (annotator.prevAnnotationImg) {
+      ctx.putImageData(annotator.prevAnnotationImg, 0, 0);
+    }
+
+    this.linePoints = [];
   };
 
   // polygon tool.
