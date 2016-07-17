@@ -218,22 +218,6 @@ define(["./base", "../compat"], function (BaseSegmentation, compat) {
     }return array;
   }
 
-  // function findMinMax(data) {
-  //   var min = Infinity, max = -Infinity;
-  //   for (var i = 0; i < data.length; ++i) {
-  //     min = Math.min(min, data[i]);
-  //     max = Math.max(max, data[i]);
-  //   }
-  //   return [min, max];
-  // }
-
-  // function sum(data) {
-  //   var value = 0;
-  //   for (var i = 0; i < data.length; ++i)
-  //     value += data[i];
-  //   return value;
-  // }
-
   SLICO.prototype.performSuperpixelSegmentationVariableSandM = function (kLabels, step, maxIterations) {
     var size = Math.floor(this.width * this.height),
         numK = this.kSeedsL.length,

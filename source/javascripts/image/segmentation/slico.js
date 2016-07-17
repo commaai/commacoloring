@@ -24,7 +24,7 @@ function(BaseSegmentation, compat) {
     this.K = options.K || 1024;
     this.step = options.step || 200;
     this.enforceConnectivity = (options.enforceConnectivity === false) ? false : true;
-    
+
     this._compute();
   }
 
@@ -230,22 +230,6 @@ function(BaseSegmentation, compat) {
       array[i] = value;
     return array;
   }
-
-  // function findMinMax(data) {
-  //   var min = Infinity, max = -Infinity;
-  //   for (var i = 0; i < data.length; ++i) {
-  //     min = Math.min(min, data[i]);
-  //     max = Math.max(max, data[i]);
-  //   }
-  //   return [min, max];
-  // }
-
-  // function sum(data) {
-  //   var value = 0;
-  //   for (var i = 0; i < data.length; ++i)
-  //     value += data[i];
-  //   return value;
-  // }
 
   SLICO.prototype.performSuperpixelSegmentationVariableSandM = function (
     kLabels,

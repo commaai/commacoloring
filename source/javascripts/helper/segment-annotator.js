@@ -27,9 +27,12 @@ define([
     this.boundaryAlpha = options.boundaryAlpha || 127;
     this.visualizationAlpha = options.visualizationAlpha || (Math.abs(255 / 2));
     this.highlightAlpha = options.highlightAlpha || Math.min(255, this.visualizationAlpha + 128);
-    this.currentZoom = 1.0;
+    this.currentZoom = options.currentZoom || 1.0;
+    this.brushSize = options.brushSize || 3;
+    this.lineSize = options.lineSize || 3;
     this.defaultLabel = options.defaultLabel || 0;
     this.maxHistoryRecord = options.maxHistoryRecord || 10;
+
     this.onchange = options.onchange || null;
     this.onrightclick = options.onrightclick || null;
     this.onleftclick = options.onleftclick || null;
@@ -153,18 +156,25 @@ define([
     return this.currentHistoryRecord >= this.history.length;
   };
 
+  // Set brush size.
+  Annotator.prototype.setBrushSize = function (size = this.brushSize) {
+    this.brushSize = size;
+    return this;
+  };
+
   // Write the brush tool
   Annotator.prototype.brush = function (pos, label) {
-    var offsets = [], labels = [];
+    var offsets = [];
+    var labels = [];
+    let offset = null;
 
-    for (var y = -3; y <= 3; y++) {
-      for (var x = -3; x <= 3; x++) {
-        // it is circle bitches
-        if ((x*x + y*y) > 9) {
+    for (let y = -(this.brushSize); y <= this.brushSize; y++) {
+      for (let x = -(this.brushSize); x <= this.brushSize; x++) {
+        if ((x*x + y*y) > (this.brushSize * 3)) {
           continue;
         }
 
-        var offset = 4 * ((pos[1]+y) * this.layers.visualization.canvas.width + (pos[0]+x));
+        offset = 4 * ((pos[1]+y) * this.layers.visualization.canvas.width + (pos[0]+x));
 
         offsets.push(offset);
         labels.push(label);
@@ -251,9 +261,12 @@ define([
   Annotator.prototype.export = function () {
     this.layers.visualization.setAlpha(255);
     this.layers.visualization.render();
-    var data = this.layers.visualization.canvas.toDataURL();
+
+    const data = this.layers.visualization.canvas.toDataURL();
+
     this.layers.visualization.setAlpha(this.visualizationAlpha);
     this.layers.visualization.render();
+
     return data;
   };
 
@@ -415,7 +428,7 @@ define([
     var isRightClickEraseModeActive = false;
     var previousLabel = 0;
 
-    canvas.oncontextmenu = function() { return false; };
+    canvas.oncontextmenu = () => false;
 
     function updateIfActive(event) {
       var offset = annotator._getClickOffset(event),
@@ -457,10 +470,6 @@ define([
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
           }
 
-          if (annotator.mode === 'line' && event.button === 0) {
-            annotator.line(event, annotator.currentLabel);
-          }
-
           if (event.button === 0 && annotator.mode === "polygon") {
             annotator._addPolygonPoint(event);
 
@@ -485,8 +494,15 @@ define([
       }
     }
 
+    const clickEvent = (event) => {
+      if (annotator.mode === 'line') {
+        annotator.line(event, annotator.currentLabel);
+      }
+    };
+
+    canvas.addEventListener('click', clickEvent, false);
+
     canvas.addEventListener('mousemove', updateIfActive);
-    canvas.addEventListener('mouseup', updateIfActive);
     canvas.addEventListener('mouseleave', function () {
       annotator._updateHighlight(null);
 
@@ -527,8 +543,7 @@ define([
   Annotator.prototype._initializeVisualizationLayer = function () {
     var layer = this.layers.visualization;
     layer.resize(this.width, this.height);
-    var initialColor = this.colormap[this.defaultLabel]
-                           .concat([this.visualizationAlpha]);
+    var initialColor = this.colormap[this.defaultLabel].concat([this.visualizationAlpha]);
     layer.fill(initialColor);
     layer.render();
   };
@@ -568,6 +583,12 @@ define([
     return [event.offsetX, event.offsetY];
   };
 
+  Annotator.prototype.setLineWidth = function (width = this.lineWidth) {
+    this.lineWidth = width;
+
+    return this;
+  };
+
   Annotator.prototype.line = function (event, label) {
     const annotator = this;
     const pos = this._getClickPos(event);
@@ -576,7 +597,7 @@ define([
     const ctx = canvas.getContext('2d');
 
     ctx.strokeStyle = 'rgba(0, 0, 0, 255)';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = this.lineWidth;
 
     if (this.linePoints.length === 0) {
       ctx.save();
@@ -594,6 +615,8 @@ define([
       this.linePoints.push(pos);
 
       this._addLineToAnnotator();
+
+      this.linePoints = [];
     }
   };
 
@@ -607,7 +630,8 @@ define([
     canvas.height = annotator.layers.annotation.canvas.height;
 
     ctx.strokeStyle = `rgba(${lineColor[0]}, ${lineColor[1]}, ${lineColor[2]}, ${lineColor[3]})`;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = this.lineWidth;
+
     ctx.beginPath();
     ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
     ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
@@ -634,11 +658,6 @@ define([
 
     annotator._updateAnnotation(pixelsLine, annotator.currentLabel);
     annotator._emptyLines();
-
-    /*var w=window.open('about:blank','image from canvas');
-    w.document.write("<img src='"+canvas.toDataURL("image/png")+"' alt='from canvas'/>");*/
-
-    console.log(pixelsLine);
   };
 
   Annotator.prototype._emptyLines = function () {

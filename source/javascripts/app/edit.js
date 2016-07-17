@@ -46,21 +46,25 @@ define([
 
   // Creates sliders.
   function createSlidersFromElements (annotator) {
-    var pixelSizeSlider = $('.pixel-size-slider')[0];
-    var brightnessSlider = $('.brightness-slider')[0];
-    var zoomSlider = $('.zoom-slider')[0];
+    let pixelSizeSlider = $('.pixel-size-slider')[0];
+    let brightnessSlider = $('.brightness-slider')[0];
+    let zoomSlider = $('.zoom-slider')[0];
+    let brushSizeSlider = $('.brush-size-slider')[0];
+    let lineWidthSlider = $('.line-width-slider')[0];
 
-    var pixelSizeLabel = $('.pixel-size-label');
-    var brightnessLabel = $('.brightness-label');
+    let pixelSizeLabel = $('.pixel-size-label');
+    let brightnessLabel = $('.brightness-label');
 
-    var zoomValue = $('.zoom-value');
-    var brightnessValue = $('.brightness-value');
-    var pixelSizeValue = $('.pixel-size-value');
+    let zoomValue = $('.zoom-value');
+    let brightnessValue = $('.brightness-value');
+    let pixelSizeValue = $('.pixel-size-value');
+    let brushSizeValue = $('.brush-size-value');
+    let lineWidthValue = $('.line-width-value');
 
-    var temporaryElementHolder = null;
+    let temporaryElementHolder = null;
 
     // Pixel size slider configuration.
-    var pixelSizeSliderConfig = {
+    const pixelSizeSliderConfig = {
       min: 11,
       max: 110,
       step: 11,
@@ -69,7 +73,7 @@ define([
     };
 
     // Brightness slider configuration.
-    var brightnessSliderConfig = {
+    const brightnessSliderConfig = {
       min: 0,
       max: 100,
       step: 5,
@@ -78,17 +82,37 @@ define([
     };
 
     // Zoom slider configuration.
-    var zoomSliderConfig = {
+    const zoomSliderConfig = {
       min: 1,
       max: 3,
       step: 0.1,
       value: 1
     };
 
-    // Value holders.
-    var currentPixelSize = pixelSizeSliderConfig.value;
-    var currentBrightnessValue = brightnessSliderConfig.value;
+    // Brush size configuration.
+    const brushSizeSliderConfig = {
+      min: 3,
+      max: 50,
+      step: 1,
+      value: 3
+    };
 
+    // Line width configuration.
+    const lineWidthSliderConfig = {
+      min: 3,
+      max: 50,
+      step: 1,
+      value: 3
+    };
+
+    // Value holders.
+    let currentPixelSize = pixelSizeSliderConfig.value;
+    let currentBrightnessValue = brightnessSliderConfig.value;
+    let currentZoomValue = zoomSliderConfig.value;
+    let currentBrushSizeValue = brushSizeSliderConfig.value;
+    let currentLineWidthValue = lineWidthSliderConfig.value;
+
+    // Create superpixel size slider.
     createSlider(pixelSizeSlider, pixelSizeSliderConfig, function (value) {
       value = Math.abs(value);
 
@@ -114,6 +138,7 @@ define([
       });
     });
 
+    // Create brightness slider.
     createSlider(brightnessSlider, brightnessSliderConfig, function (value) {
       value = Math.abs(value);
 
@@ -138,11 +163,40 @@ define([
       });
     });
 
+    // Create zoom slider.
     createSlider(zoomSlider, zoomSliderConfig, function (value) {
+      currentZoomValue = value;
+
       zoomValue.text(value);
       annotator.zoom(value);
     }, function (setValue) {
+      Mousetrap.bind(['z +'], function () {
+        if ((currentZoomValue + zoomSliderConfig.step) <= zoomSliderConfig.max) {
+          setValue(currentZoomValue + zoomSliderConfig.step);
+        }
+      });
 
+      Mousetrap.bind(['z -'], function () {
+        if ((currentZoomValue - zoomSliderConfig.step) >= zoomSliderConfig.min) {
+          setValue(currentZoomValue - zoomSliderConfig.step);
+        }
+      });
+    });
+
+    // Create brush size slider.
+    createSlider(brushSizeSlider, brushSizeSliderConfig, function (value) {
+      value = Math.abs(value);
+
+      annotator.setBrushSize(value);
+      brushSizeValue.text(value);
+    });
+
+    // Create line width slider.
+    createSlider(lineWidthSlider, lineWidthSliderConfig, function (value) {
+      value = Math.abs(value);
+
+      annotator.setLineWidth(value);
+      lineWidthValue.text(value);
     });
 
     // Toggle pixel size.

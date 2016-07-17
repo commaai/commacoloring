@@ -47,6 +47,8 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
     var pixelSizeSlider = $('.pixel-size-slider')[0];
     var brightnessSlider = $('.brightness-slider')[0];
     var zoomSlider = $('.zoom-slider')[0];
+    var brushSizeSlider = $('.brush-size-slider')[0];
+    var lineWidthSlider = $('.line-width-slider')[0];
 
     var pixelSizeLabel = $('.pixel-size-label');
     var brightnessLabel = $('.brightness-label');
@@ -54,6 +56,8 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
     var zoomValue = $('.zoom-value');
     var brightnessValue = $('.brightness-value');
     var pixelSizeValue = $('.pixel-size-value');
+    var brushSizeValue = $('.brush-size-value');
+    var lineWidthValue = $('.line-width-value');
 
     var temporaryElementHolder = null;
 
@@ -83,10 +87,30 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
       value: 1
     };
 
+    // Brush size configuration.
+    var brushSizeSliderConfig = {
+      min: 3,
+      max: 50,
+      step: 1,
+      value: 3
+    };
+
+    // Line width configuration.
+    var lineWidthSliderConfig = {
+      min: 3,
+      max: 50,
+      step: 1,
+      value: 3
+    };
+
     // Value holders.
     var currentPixelSize = pixelSizeSliderConfig.value;
     var currentBrightnessValue = brightnessSliderConfig.value;
+    var currentZoomValue = zoomSliderConfig.value;
+    var currentBrushSizeValue = brushSizeSliderConfig.value;
+    var currentLineWidthValue = lineWidthSliderConfig.value;
 
+    // Create superpixel size slider.
     createSlider(pixelSizeSlider, pixelSizeSliderConfig, function (value) {
       value = Math.abs(value);
 
@@ -112,6 +136,7 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
       });
     });
 
+    // Create brightness slider.
     createSlider(brightnessSlider, brightnessSliderConfig, function (value) {
       value = Math.abs(value);
 
@@ -136,10 +161,41 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
       });
     });
 
+    // Create zoom slider.
     createSlider(zoomSlider, zoomSliderConfig, function (value) {
+      currentZoomValue = value;
+
       zoomValue.text(value);
       annotator.zoom(value);
-    }, function (setValue) {});
+    }, function (setValue) {
+      Mousetrap.bind(['z +'], function () {
+        if (currentZoomValue + zoomSliderConfig.step <= zoomSliderConfig.max) {
+          setValue(currentZoomValue + zoomSliderConfig.step);
+        }
+      });
+
+      Mousetrap.bind(['z -'], function () {
+        if (currentZoomValue - zoomSliderConfig.step >= zoomSliderConfig.min) {
+          setValue(currentZoomValue - zoomSliderConfig.step);
+        }
+      });
+    });
+
+    // Create brush size slider.
+    createSlider(brushSizeSlider, brushSizeSliderConfig, function (value) {
+      value = Math.abs(value);
+
+      annotator.setBrushSize(value);
+      brushSizeValue.text(value);
+    });
+
+    // Create line width slider.
+    createSlider(lineWidthSlider, lineWidthSliderConfig, function (value) {
+      value = Math.abs(value);
+
+      annotator.setLineWidth(value);
+      lineWidthValue.text(value);
+    });
 
     // Toggle pixel size.
     pixelSizeLabel.on('click', function () {

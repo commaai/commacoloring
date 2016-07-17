@@ -4,13 +4,13 @@
 - [x] Slider - zoom
 - [x] Hotkeys - Pixel size
 - [x] Hotkeys - Brightness
-- [ ] Straight line tool w/ variable
-- [ ] Paintbrush tool
+- [x] Straight line tool w/ variable
+- [x] Paintbrush tool
 - [x] Right click erase
 - [ ] A “% Complete” marker on the left hand side
 
 *Extra:*
 - [ ] Code format
 - [ ] Optimize javascript
-- [ ] Convert UMD modules to webpack
+- [ ] Convert UMD modules to ES6 for webpack/browserify
 - [x] ES5 to ES6 w/ Babel
