@@ -2,7 +2,7 @@
 
 /** Editor page renderer.
  */
-define(['../image/layer', '../helper/segment-annotator', '../helper/util'], function (Layer, Annotator, util) {
+define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annotator) {
   // Create slider element.
   function createSlider(slider, options, callback, hotkeyCallback) {
     if (!slider) {
@@ -13,8 +13,8 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
       start: [options.value || 1],
       step: options.step || 1,
       range: {
-        'min': [options.min || 0],
-        'max': [options.max || 10]
+        min: [options.min || 0],
+        max: [options.max || 10]
       }
     });
 
@@ -185,16 +185,20 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
     createSlider(brushSizeSlider, brushSizeSliderConfig, function (value) {
       value = Math.abs(value);
 
-      annotator.setBrushSize(value);
-      brushSizeValue.text(value);
+      currentBrushSizeValue = value;
+
+      annotator.setBrushSize(currentBrushSizeValue);
+      brushSizeValue.text(currentBrushSizeValue);
     });
 
     // Create line width slider.
     createSlider(lineWidthSlider, lineWidthSliderConfig, function (value) {
       value = Math.abs(value);
 
-      annotator.setLineWidth(value);
-      lineWidthValue.text(value);
+      currentLineWidthValue = value;
+
+      annotator.setLineWidth(currentLineWidthValue);
+      lineWidthValue.text(currentLineWidthValue);
     });
 
     // Toggle pixel size.
@@ -246,7 +250,6 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
 
   // Create toolset bar.
   function createToolSetbar(annotator) {
-    var currentActiveTool = 0;
     var selectTool = function selectTool(tool) {
       $(tool).css({
         'background-color': '#c0c0c0',
@@ -320,17 +323,25 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
     }
 
     $(".img-submit").click(function () {
-      //open(annotator.export());
       var percent = annotator.getFilledPercent();
+
       if (percent < 0.10) {
-        alert("Please color in the image before clicking submit!");
+        alert('Please color in the image before clicking submit!');
       } else {
-        var data = annotator.export();
+        var _data = annotator.export();
         var name = annotator.imageName;
-        $.post("/submit", { data: data, name: name, track: Cookies.get("track"), email: user_email, gid: user_gid }, function () {
+
+        $.post("/submit", {
+          data: _data,
+          name: name,
+          track: Cookies.get('track'),
+          email: user_email,
+          gid: user_gid
+        }, function () {
           var count = getCount();
+
           count += 1;
-          Cookies.set("count", count.toString());
+          Cookies.set('count', count.toString());
           location.reload();
         });
       }
@@ -429,50 +440,10 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
     }
   }
 
-  // Create the relabel selector.
-  function createRelabelSelector(data, index, annotator, popupContainer) {
-    var select = document.createElement("select"),
-        firstOption = document.createElement("option");
-    firstOption.appendChild(document.createTextNode("Change to"));
-    select.appendChild(firstOption);
-    for (var i = 0; i < data.labels.length; ++i) {
-      if (i !== index) {
-        var option = document.createElement("option");
-        option.value = i;
-        option.appendChild(document.createTextNode(data.labels[i]));
-        select.appendChild(option);
-      }
-    }
-    select.addEventListener("change", function (event) {
-      var sourceLabel = index;
-      var targetLabel = parseInt(event.target.value, 10);
-      if (sourceLabel !== targetLabel) {
-        var currentLabel = annotator.currentLabel;
-        annotator.currentLabel = targetLabel;
-        annotator.fill(sourceLabel);
-        annotator.currentLabel = currentLabel;
-      }
-      popupContainer.classList.remove("edit-sidebar-popup-active");
-      firstOption.selected = true;
-      event.preventDefault();
-    });
-    return select;
-  }
-
-  // Download trick.
-  function downloadURI(uri, filename) {
-    var anchor = document.createElement("a");
-    anchor.style.display = "none";
-    anchor.target = "_blank"; // Safari doesn't work.
-    anchor.download = filename;
-    anchor.href = uri;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-  }
-
   // Entry point.
   function render(data, params) {
+    var id = parseInt(params.id, 10);
+
     // Replace with /sample
     $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function (json) {
       var annotator = new Annotator(json.data, {
@@ -480,23 +451,25 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
         height: params.height,
         colormap: data.colormap,
         superpixelOptions: {
-          method: "slic",
+          method: 'slic',
           regionSize: 25
         },
+
         onload: function onload() {
           if (data.annotationURLs) {
             annotator.import(data.annotationURLs[id]);
           }
 
-          annotator.hide("boundary");
+          annotator.hide('boundary');
           flashBoundaries(annotator);
         },
+
         onchange: function onchange() {
-          var activeLabels = this.getUniqueLabels(),
-              legendClass = "edit-sidebar-legend-label",
-              legendActiveClass = "edit-sidebar-legend-label-active",
-              elements = document.getElementsByClassName(legendClass),
-              i;
+          var activeLabels = this.getUniqueLabels();
+          var legendClass = 'edit-sidebar-legend-label';
+          var legendActiveClass = 'edit-sidebar-legend-label-active';
+          var elements = document.getElementsByClassName(legendClass);
+          var i = void 0;
 
           for (i = 0; i < elements.length; ++i) {
             elements[i].classList.remove(legendActiveClass);
@@ -508,9 +481,11 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
 
           addPercentageInformation(annotator);
         },
+
         onrightclick: function onrightclick(label) {
-          document.getElementById("label-" + label + "-button").click();
+          document.getElementById('label-' + label + '-button').click();
         },
+
         onmousemove: highlightLabel
       });
 

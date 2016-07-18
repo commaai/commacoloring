@@ -1,9 +1,5 @@
 var auth2 = null;
 
-function p(x) {
-  console.log(x);
-}
-
 // fill this in
 var user_email = "none";
 var user_gid = "0";

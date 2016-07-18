@@ -8,10 +8,9 @@
 - [x] Paintbrush tool
 - [x] Right click erase
 - [x] A “% Complete” marker on the left hand side
-- [x] Undo functionality
+- [x] Undo functionality (CTRL + Z)
+- [x] Redo functionality (CTRL + Y)
 
 *Extra:*
-- [ ] Code format
-- [ ] Optimize javascript
-- [ ] Convert UMD modules to ES6 for webpack/browserify
+- [x] Code format
 - [x] ES5 to ES6 w/ Babel

@@ -3,8 +3,7 @@
 define([
   '../image/layer',
   '../helper/segment-annotator',
-  '../helper/util'
-], function(Layer, Annotator, util) {
+], function(Layer, Annotator) {
   // Create slider element.
   function createSlider (slider, options, callback, hotkeyCallback) {
     if (!slider) {
@@ -12,17 +11,17 @@ define([
     }
 
     noUiSlider.create(slider, {
-    	start: [ options.value || 1 ],
-    	step: options.step || 1,
-    	range: {
-    		'min': [ options.min || 0 ],
-    		'max': [ options.max || 10 ]
-    	}
+      start: [ options.value || 1 ],
+      step: options.step || 1,
+      range: {
+        min: [ options.min || 0 ],
+        max: [ options.max || 10 ]
+      }
     });
 
     if (callback && typeof callback === 'function') {
-      slider.noUiSlider.on('update', function(values, handle) {
-      	callback(values[handle]);
+      slider.noUiSlider.on('update', (values, handle) => {
+        callback(values[handle]);
       });
     }
 
@@ -187,16 +186,20 @@ define([
     createSlider(brushSizeSlider, brushSizeSliderConfig, function (value) {
       value = Math.abs(value);
 
-      annotator.setBrushSize(value);
-      brushSizeValue.text(value);
+      currentBrushSizeValue = value;
+
+      annotator.setBrushSize(currentBrushSizeValue);
+      brushSizeValue.text(currentBrushSizeValue);
     });
 
     // Create line width slider.
     createSlider(lineWidthSlider, lineWidthSliderConfig, function (value) {
       value = Math.abs(value);
 
-      annotator.setLineWidth(value);
-      lineWidthValue.text(value);
+      currentLineWidthValue = value;
+
+      annotator.setLineWidth(currentLineWidthValue);
+      lineWidthValue.text(currentLineWidthValue);
     });
 
     // Toggle pixel size.
@@ -248,7 +251,6 @@ define([
 
   // Create toolset bar.
   function createToolSetbar (annotator) {
-    let currentActiveTool = 0;
     const selectTool = (tool) => {
       $(tool).css({
         'background-color': '#c0c0c0',
@@ -321,18 +323,26 @@ define([
       $(".edit-image-count")[0].style.color = "#008000";
     }
 
-    $(".img-submit").click(function() {
-      //open(annotator.export());
+    $(".img-submit").click(() => {
       var percent = annotator.getFilledPercent();
+
       if (percent < 0.10) {
-        alert("Please color in the image before clicking submit!");
+        alert('Please color in the image before clicking submit!');
       } else {
-        var data = annotator.export();
-        var name = annotator.imageName;
-        $.post("/submit", { data: data, name: name, track: Cookies.get("track"), email: user_email, gid: user_gid }, function() {
-          var count = getCount();
+        let data = annotator.export();
+        let name = annotator.imageName;
+
+        $.post("/submit", {
+          data: data,
+          name: name,
+          track: Cookies.get('track'),
+          email: user_email,
+          gid: user_gid
+        }, () => {
+          let count = getCount();
+
           count += 1;
-          Cookies.set("count", count.toString());
+          Cookies.set('count', count.toString());
           location.reload();
         });
       }
@@ -437,50 +447,10 @@ define([
     }
   }
 
-  // Create the relabel selector.
-  function createRelabelSelector(data, index, annotator, popupContainer) {
-    var select = document.createElement("select"),
-        firstOption = document.createElement("option");
-    firstOption.appendChild(document.createTextNode("Change to"));
-    select.appendChild(firstOption);
-    for (var i = 0; i < data.labels.length; ++i) {
-      if (i !== index) {
-        var option = document.createElement("option");
-        option.value = i;
-        option.appendChild(document.createTextNode(data.labels[i]));
-        select.appendChild(option);
-      }
-    }
-    select.addEventListener("change", function (event) {
-      var sourceLabel = index;
-      var targetLabel = parseInt(event.target.value, 10);
-      if (sourceLabel !== targetLabel) {
-        var currentLabel = annotator.currentLabel;
-        annotator.currentLabel = targetLabel;
-        annotator.fill(sourceLabel);
-        annotator.currentLabel = currentLabel;
-      }
-      popupContainer.classList.remove("edit-sidebar-popup-active");
-      firstOption.selected = true;
-      event.preventDefault();
-    });
-    return select;
-  }
-
-  // Download trick.
-  function downloadURI(uri, filename) {
-    var anchor = document.createElement("a");
-    anchor.style.display = "none";
-    anchor.target = "_blank"; // Safari doesn't work.
-    anchor.download = filename;
-    anchor.href = uri;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-  }
-
   // Entry point.
   function render(data, params) {
+    const id = parseInt(params.id, 10);
+
     // Replace with /sample
     $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function(json) {
       var annotator = new Annotator(json.data, {
@@ -488,23 +458,25 @@ define([
         height: params.height,
         colormap: data.colormap,
         superpixelOptions: {
-          method: "slic",
+          method: 'slic',
           regionSize: 25
         },
-        onload: function () {
+
+        onload: () => {
           if (data.annotationURLs) {
             annotator.import(data.annotationURLs[id]);
           }
 
-          annotator.hide("boundary");
+          annotator.hide('boundary');
           flashBoundaries(annotator);
         },
+
         onchange: function () {
-          var activeLabels = this.getUniqueLabels(),
-              legendClass = "edit-sidebar-legend-label",
-              legendActiveClass = "edit-sidebar-legend-label-active",
-              elements = document.getElementsByClassName(legendClass),
-              i;
+          let activeLabels = this.getUniqueLabels();
+          let legendClass = 'edit-sidebar-legend-label';
+          let legendActiveClass = 'edit-sidebar-legend-label-active';
+          let elements = document.getElementsByClassName(legendClass);
+          let i;
 
           for (i = 0; i < elements.length; ++i) {
             elements[i].classList.remove(legendActiveClass);
@@ -516,9 +488,11 @@ define([
 
           addPercentageInformation(annotator);
         },
+
         onrightclick: function (label) {
-          document.getElementById("label-" + label + "-button").click();
+          document.getElementById(`label-${label}-button`).click();
         },
+
         onmousemove: highlightLabel
       });
 

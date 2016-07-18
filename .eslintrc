@@ -1,0 +1,19 @@
+{
+  "parser": "babel-eslint",
+  "rules": {
+    "strict": 0,
+    "no-undef": 1,
+    "semi": [2, "always"],
+    "indent": [0, 2],
+    "no-console": [1, { allow: ["warn", "error"] }]
+  },
+  "extends": ["eslint:recommended"],
+  "env": {
+    "es6": true,
+    "browser": true,
+    "mocha": false,
+    "node": false,
+    "jquery": true,
+    "amd": true
+  }
+}

@@ -9,10 +9,10 @@
  * Copyright 2015  Kota Yamaguchi
  */
 define([
-  "./segmentation/pff",
-  "./segmentation/slic",
-  "./segmentation/slico",
-  "./segmentation/watershed"
+  './segmentation/pff',
+  './segmentation/slic',
+  './segmentation/slico',
+  './segmentation/watershed'
 ], function (pff, slic, slico, watershed) {
   let methods = {
     pff: pff,
@@ -22,10 +22,10 @@ define([
   };
 
   methods.create = function (imageData, options = {}) {
-    options.method = options.method || "slic";
+    options.method = options.method || 'slic';
 
     if (!methods[options.method]) {
-      throw "Invalid method: " + options.method;
+      throw `Invalid method: ${options.method}`;
     }
 
     return new methods[options.method](imageData, options);

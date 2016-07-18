@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /** Image segmentation factory.
  *
@@ -10,7 +10,7 @@
  *
  * Copyright 2015  Kota Yamaguchi
  */
-define(["./segmentation/pff", "./segmentation/slic", "./segmentation/slico", "./segmentation/watershed"], function (pff, slic, slico, watershed) {
+define(['./segmentation/pff', './segmentation/slic', './segmentation/slico', './segmentation/watershed'], function (pff, slic, slico, watershed) {
   var methods = {
     pff: pff,
     slic: slic,
@@ -21,10 +21,10 @@ define(["./segmentation/pff", "./segmentation/slic", "./segmentation/slico", "./
   methods.create = function (imageData) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-    options.method = options.method || "slic";
+    options.method = options.method || 'slic';
 
     if (!methods[options.method]) {
-      throw "Invalid method: " + options.method;
+      throw 'Invalid method: ' + options.method;
     }
 
     return new methods[options.method](imageData, options);
