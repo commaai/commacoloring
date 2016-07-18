@@ -226,6 +226,26 @@ define([
     });
   }
 
+  // Add percentage filled information.
+  function addPercentageInformation (annotator) {
+    const element = $('.edit-image-percent-done');
+    const percentFilled = Math.round(annotator.getFilledPercent() * 100, 1);
+    const text = `${percentFilled}% done`;
+
+    element.text(text);
+  }
+
+  // Add hotkeys (non-slider related as those are added at slider functions).
+  function addHotkeys (annotator) {
+    Mousetrap.bind(['command+z', 'ctrl+z'], () => {
+      annotator.undo();
+    });
+
+    Mousetrap.bind(['command+y', 'ctrl+y'], () => {
+      annotator.redo();
+    });
+  }
+
   // Create toolset bar.
   function createToolSetbar (annotator) {
     let currentActiveTool = 0;
@@ -265,6 +285,8 @@ define([
 
     createSlidersFromElements(annotator);
     createToolSetbar(annotator);
+    addPercentageInformation(annotator);
+    addHotkeys(annotator);
 
     var sidebarContainer = $("#lhp")[0];
     sidebarContainer.appendChild(sidebar);
@@ -491,6 +513,8 @@ define([
           for (i = 0; i < activeLabels.length; ++i) {
             elements[activeLabels[i]].classList.add(legendActiveClass);
           }
+
+          addPercentageInformation(annotator);
         },
         onrightclick: function (label) {
           document.getElementById("label-" + label + "-button").click();

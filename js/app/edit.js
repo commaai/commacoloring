@@ -224,6 +224,26 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
     });
   }
 
+  // Add percentage filled information.
+  function addPercentageInformation(annotator) {
+    var element = $('.edit-image-percent-done');
+    var percentFilled = Math.round(annotator.getFilledPercent() * 100, 1);
+    var text = percentFilled + '% done';
+
+    element.text(text);
+  }
+
+  // Add hotkeys (non-slider related as those are added at slider functions).
+  function addHotkeys(annotator) {
+    Mousetrap.bind(['command+z', 'ctrl+z'], function () {
+      annotator.undo();
+    });
+
+    Mousetrap.bind(['command+y', 'ctrl+y'], function () {
+      annotator.redo();
+    });
+  }
+
   // Create toolset bar.
   function createToolSetbar(annotator) {
     var currentActiveTool = 0;
@@ -263,6 +283,8 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
 
     createSlidersFromElements(annotator);
     createToolSetbar(annotator);
+    addPercentageInformation(annotator);
+    addHotkeys(annotator);
 
     var sidebarContainer = $("#lhp")[0];
     sidebarContainer.appendChild(sidebar);
@@ -483,6 +505,8 @@ define(['../image/layer', '../helper/segment-annotator', '../helper/util'], func
           for (i = 0; i < activeLabels.length; ++i) {
             elements[activeLabels[i]].classList.add(legendActiveClass);
           }
+
+          addPercentageInformation(annotator);
         },
         onrightclick: function onrightclick(label) {
           document.getElementById("label-" + label + "-button").click();

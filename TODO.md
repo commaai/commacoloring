@@ -7,7 +7,8 @@
 - [x] Straight line tool w/ variable
 - [x] Paintbrush tool
 - [x] Right click erase
-- [ ] A “% Complete” marker on the left hand side
+- [x] A “% Complete” marker on the left hand side
+- [x] Undo functionality
 
 *Extra:*
 - [ ] Code format

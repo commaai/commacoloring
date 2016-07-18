@@ -274,11 +274,7 @@ define([
   Annotator.prototype.isLayerShown = function (layer) {
     const displayValue = this.layers[layer].canvas.style.display;
 
-    if (displayValue === 'inline-block' || displayValue === 'block') {
-      return true;
-    } else {
-      return false;
-    }
+    return !!((displayValue === 'inline-block' || displayValue === 'block') && true);
   }
 
   // Show a specified layer.
@@ -294,17 +290,28 @@ define([
   };
 
   Annotator.prototype.getFilledPercent = function () {
-    var layer = this.layers.visualization;
-    var data = layer.imageData.data;
-    var tt = 0;
-    var dd = 0;
+    const layer = this.layers.visualization;
 
-    for (var i = 0; i < data.length; i+= 4) {
-      var pxl = data[i] + data[i+1] + data[i+2];
-      if (pxl != 255*3) tt += 1;
-      dd += 1;
+    if (layer && layer.imageData && layer.imageData.data) {
+      const data = layer.imageData.data;
+      let tt = 0;
+      let dd = 0;
+      let pxl = null;
+
+      for (let i = 0; i < data.length; i+= 4) {
+        pxl = data[i] + data[i+1] + data[i+2];
+
+        if (pxl != 255*3) {
+          tt += 1;
+        }
+
+        dd += 1;
+      }
+
+      return (tt * 1.0) / dd;
     }
-    return tt*1.0/dd;
+
+    return 0;
   }
 
   // Highlight a specified label.
