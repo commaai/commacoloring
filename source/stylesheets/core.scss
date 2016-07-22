@@ -1,6 +1,42 @@
+html,
 body {
-    transform-origin: top left;
-    width: 1400px;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-size: 16px;
+}
+
+.edit-main-container {
+    position: relative;
+    white-space: nowrap;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.edit-image-aside {
+    display: inline-block;
+    width: 350px;
+    height: 100%;
+    background: #eee;
+    overflow: hidden;
+}
+
+.edit-image-display {
+    display: inline-block;
+    vertical-align: top;
+    background: #eee;
+    height: 100%;
+    overflow: hidden;
+    width: calc(100% - 350px);
+}
+
+.edit-image-percent-done {
+    background: #ccc;
+    width: 100%;
+    display: block;
+    padding: 10px 20px;
+    font-weight: bold;
 }
 
 .segment-viewer-overlay-container {
@@ -107,7 +143,7 @@ body {
   display: inline-block;
   width: 15em;
   padding: 0 0.3em;
-  font-size: 20px;
+  font-size: 16px;
 }
 .edit-sidebar-legend-label-active {
   color: black;
@@ -213,20 +249,6 @@ body {
   width: 1em;
 }
 
-.edit-main-container {
-    position: relative;
-    white-space: nowrap;
-    width: 1400px;
-}
-
-.edit-image-display {
-    display: inline-block;
-    vertical-align: top;
-    margin-right: 10px;
-    background: #eee;
-}
-
-
 .edit-top-menu-block {
   display: inline-block;
   margin: 0 .5em;
@@ -277,10 +299,21 @@ body {
 .sliders {
     position: relative;
     width: 100%;
+    margin-top: 20px;
 
     &__item {
         position: relative;
         padding: 10px 20px 15px 20px;
+        height: auto;
+        overflow: hidden;
+        opacity: 1;
+        transition: all 0.3s ease;
+
+        &.hide {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+        }
 
         &:last-child {
             margin-bottom: 20px;
@@ -313,22 +346,5 @@ body {
         top: 10px;
         right: 20px;
         font-weight: 700;
-    }
-}
-
-// Title block
-.title {
-    position: relative;
-    padding: 0 20px;
-    margin-bottom: 5px;
-
-    &:first-child {
-        margin-top: 30px;
-    }
-
-    h3 {
-        margin: 0;
-        padding: 0;
-        color: #333;
     }
 }

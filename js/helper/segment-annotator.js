@@ -45,6 +45,9 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     this.onhighlight = options.onhighlight || null;
     this.onmousemove = options.onmousemove || null;
 
+    this.startX = 0;
+    this.startY = 0;
+
     this._createLayers(options);
     this._initializeHistory(options);
     this._createLayers(options);
@@ -54,6 +57,9 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     this.polygonPoints = [];
     this.linePoints = [];
     this.prevAnnotationImg = null;
+    this.lineToolActive = false;
+
+    console.log(options);
 
     this.layers.image.load(imageURL, {
       width: options.width,
@@ -395,7 +401,7 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     this.container.style.height = this.height + "px";
   };
 
-  Annotator.prototype._initializeHistory = function (options) {
+  Annotator.prototype._initializeHistory = function () {
     this.history = [];
     this.currentHistoryRecord = -1;
   };
@@ -472,6 +478,8 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
         } else {
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
+          } else if (annotator.mode === 'line' && event.button === 0) {
+            annotator.line(event, annotator.currentLabel);
           }
 
           if (event.button === 0 && annotator.mode === "polygon") {
@@ -498,14 +506,6 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
       }
     }
 
-    var clickEvent = function clickEvent(event) {
-      if (annotator.mode === 'line') {
-        annotator.line(event, annotator.currentLabel);
-      }
-    };
-
-    canvas.addEventListener('click', clickEvent, false);
-
     canvas.addEventListener('mousemove', updateIfActive);
     canvas.addEventListener('mouseleave', function () {
       annotator._updateHighlight(null);
@@ -516,6 +516,14 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     });
 
     canvas.addEventListener('mousedown', function (event) {
+      var clickPos = annotator._getClickPos(event);
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      annotator.startX = clickPos[0];
+      annotator.startY = clickPos[1];
+
       mousestate.down = true;
       mousestate.button = event.button;
     });
@@ -523,6 +531,10 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     window.addEventListener('mouseup', function () {
       mousestate.down = false;
       mousestate.button = 0;
+
+      if (annotator.mode === 'line') {
+        annotator._addLineToAnnotator();
+      }
     });
   };
 
@@ -595,8 +607,10 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     return this;
   };
 
-  Annotator.prototype.line = function (event, label) {
+  Annotator.prototype.line = function (event) {
     var annotator = this;
+    var canvas = annotator.layers.annotation.canvas;
+    var ctx = canvas.getContext('2d');
     var pos = this._getClickPos(event);
 
     var _pos = _slicedToArray(pos, 2);
@@ -604,31 +618,25 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     var x = _pos[0];
     var y = _pos[1];
 
-    var canvas = annotator.layers.annotation.canvas;
-    var ctx = canvas.getContext('2d');
+
+    if (!this.lineToolActive) {
+      ctx.save();
+      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.strokeStyle = 'rgba(0, 0, 0, 255)';
     ctx.lineWidth = this.lineWidth;
 
-    if (this.linePoints.length === 0) {
-      ctx.save();
-      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.moveTo(this.startX, this.startY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(x, y);
+    this.linePoints = pos;
 
-      this.linePoints.push(pos);
-    } else {
-      ctx.lineTo(x, y);
-      ctx.closePath();
-      ctx.stroke();
-
-      this.linePoints.push(pos);
-
-      this._addLineToAnnotator();
-
-      this.linePoints = [];
-    }
+    this.lineToolActive = true;
   };
 
   Annotator.prototype._addLineToAnnotator = function () {
@@ -644,8 +652,8 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
     ctx.lineWidth = this.lineWidth;
 
     ctx.beginPath();
-    ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
-    ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
+    ctx.moveTo(annotator.startX, annotator.startY);
+    ctx.lineTo(annotator.linePoints[0], annotator.linePoints[1]);
     ctx.closePath();
     ctx.stroke();
 
@@ -666,6 +674,8 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
 
     annotator._updateAnnotation(pixelsLine, annotator.currentLabel);
     annotator._emptyLines();
+
+    this.lineToolActive = false;
   };
 
   Annotator.prototype._emptyLines = function () {
@@ -790,6 +800,15 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
 
   Annotator.prototype._setMode = function (mode) {
     this.mode = mode;
+
+    $('#brush-size').addClass('hide');
+    $('#line-width').addClass('hide');
+
+    if (mode === 'brush') {
+      $('#brush-size').removeClass('hide');
+    } else if (mode === 'line') {
+      $('#line-width').removeClass('hide');
+    }
   };
 
   Annotator.prototype._updateHighlight = function (pixels) {

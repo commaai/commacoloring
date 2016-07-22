@@ -10,22 +10,11 @@
     <script src="js/jQuery.nouislider.min.js"></script>
     <script src="js/mousetrap.min.js"></script>
     <script src="js/js.cookie.js"></script>
-
-    <script>
-    function handleResize() {
-      document.body.style.transform = "scale("+(window.innerWidth/1450.0)+")";
-    }
-    window.onresize = handleResize;
-    window.onload = handleResize;
-    </script>
   </head>
   <body>
     <div class="edit-main-container">
       <!-- left hand panel -->
-      <div class="edit-image-display">
-        <div class="title">
-          <h3>Sliders</h3>
-        </div>
+      <div class="edit-image-aside">
         <div class="sliders">
           <div class="sliders__item">
             <h4 class="sliders__label pixel-size-label">Pixel Size</h4>
@@ -42,12 +31,12 @@
             <span class="sliders__value zoom-value"></span>
             <div class="zoom-slider"></div>
           </div>
-          <div class="sliders__item">
+          <div class="sliders__item hide" id="brush-size">
             <h4 class="sliders__label">Brush Size</h4>
             <span class="sliders__value brush-size-value"></span>
             <div class="brush-size-slider"></div>
           </div>
-          <div class="sliders__item">
+          <div class="sliders__item hide" id="line-width">
             <h4 class="sliders__label">Line Width</h4>
             <span class="sliders__value line-width-value"></span>
             <div class="line-width-slider"></div>
@@ -58,12 +47,12 @@
         <div class="toolchest">
           <img class="tool" data-tool="superpixel" title="Superpixel tool" id="tool-wand" src="img/wand.png" />
           <img class="tool" data-tool="brush" title="Brush tool" id="tool-brush" src="img/brush.png" />
-          <img class="tool" data-tool="line" title="Line tool" id="tool-line" src="img/brush.png" />
+          <img class="tool" data-tool="line" title="Line tool" id="tool-line" src="img/line.png" />
           <img class="tool" data-tool="polygon" title="Polygon tool" id="tool-polygon" src="img/polygon.png" />
           <button class="suggest-button">suggest</button>
         </div>
 
-        <div class="edit-image-percent-done"></div>
+        <div class="edit-image-percent-done">0% done</div>
 
         <div class="img-submit-box"><button class="img-submit">submit</button></div>
         <div class="edit-image-instructions">color the picture appropriately, click submit, earn a <span style="color: goldenrod">comma point</span>*</div>

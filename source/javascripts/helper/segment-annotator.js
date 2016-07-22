@@ -39,6 +39,9 @@ define([
     this.onhighlight = options.onhighlight || null;
     this.onmousemove = options.onmousemove || null;
 
+    this.startX = 0;
+    this.startY = 0;
+
     this._createLayers(options);
     this._initializeHistory(options);
     this._createLayers(options);
@@ -48,6 +51,9 @@ define([
     this.polygonPoints = [];
     this.linePoints = [];
     this.prevAnnotationImg = null;
+    this.lineToolActive = false;
+
+    console.log(options);
 
     this.layers.image.load(imageURL, {
       width: options.width,
@@ -275,7 +281,7 @@ define([
     const displayValue = this.layers[layer].canvas.style.display;
 
     return !!((displayValue === 'inline-block' || displayValue === 'block') && true);
-  }
+  };
 
   // Show a specified layer.
   Annotator.prototype.show = function (layer) {
@@ -312,7 +318,7 @@ define([
     }
 
     return 0;
-  }
+  };
 
   // Highlight a specified label.
   Annotator.prototype.highlightLabel = function (label) {
@@ -402,7 +408,7 @@ define([
     this.container.style.height = this.height + "px";
   };
 
-  Annotator.prototype._initializeHistory = function (options) {
+  Annotator.prototype._initializeHistory = function () {
     this.history = [];
     this.currentHistoryRecord = -1;
   };
@@ -475,6 +481,8 @@ define([
         } else {
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
+          } else if (annotator.mode === 'line' && event.button === 0) {
+            annotator.line(event, annotator.currentLabel);
           }
 
           if (event.button === 0 && annotator.mode === "polygon") {
@@ -501,14 +509,6 @@ define([
       }
     }
 
-    const clickEvent = (event) => {
-      if (annotator.mode === 'line') {
-        annotator.line(event, annotator.currentLabel);
-      }
-    };
-
-    canvas.addEventListener('click', clickEvent, false);
-
     canvas.addEventListener('mousemove', updateIfActive);
     canvas.addEventListener('mouseleave', function () {
       annotator._updateHighlight(null);
@@ -519,6 +519,14 @@ define([
     });
 
     canvas.addEventListener('mousedown', function (event) {
+      const clickPos = annotator._getClickPos(event);
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      annotator.startX = clickPos[0];
+      annotator.startY = clickPos[1];
+
       mousestate.down = true;
       mousestate.button = event.button;
     });
@@ -526,6 +534,10 @@ define([
     window.addEventListener('mouseup', function () {
       mousestate.down = false;
       mousestate.button = 0;
+
+      if (annotator.mode === 'line') {
+        annotator._addLineToAnnotator();
+      }
     });
   };
 
@@ -596,35 +608,31 @@ define([
     return this;
   };
 
-  Annotator.prototype.line = function (event, label) {
+  Annotator.prototype.line = function (event) {
     const annotator = this;
-    const pos = this._getClickPos(event);
-    const [ x, y ] = pos;
     const canvas = annotator.layers.annotation.canvas;
     const ctx = canvas.getContext('2d');
+    const pos = this._getClickPos(event);
+    const [ x, y ] = pos;
+
+    if (!this.lineToolActive) {
+      ctx.save();
+      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     ctx.strokeStyle = 'rgba(0, 0, 0, 255)';
     ctx.lineWidth = this.lineWidth;
 
-    if (this.linePoints.length === 0) {
-      ctx.save();
-      annotator.prevAnnotationImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.moveTo(this.startX, this.startY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(x, y);
+    this.linePoints = pos;
 
-      this.linePoints.push(pos);
-    } else {
-      ctx.lineTo(x, y);
-      ctx.closePath();
-      ctx.stroke();
-
-      this.linePoints.push(pos);
-
-      this._addLineToAnnotator();
-
-      this.linePoints = [];
-    }
+    this.lineToolActive = true;
   };
 
   Annotator.prototype._addLineToAnnotator = function () {
@@ -640,8 +648,8 @@ define([
     ctx.lineWidth = this.lineWidth;
 
     ctx.beginPath();
-    ctx.moveTo(annotator.linePoints[0][0], annotator.linePoints[0][1]);
-    ctx.lineTo(annotator.linePoints[1][0], annotator.linePoints[1][1]);
+    ctx.moveTo(annotator.startX, annotator.startY);
+    ctx.lineTo(annotator.linePoints[0], annotator.linePoints[1]);
     ctx.closePath();
     ctx.stroke();
 
@@ -665,6 +673,8 @@ define([
 
     annotator._updateAnnotation(pixelsLine, annotator.currentLabel);
     annotator._emptyLines();
+
+    this.lineToolActive = false;
   };
 
   Annotator.prototype._emptyLines = function () {
@@ -796,6 +806,15 @@ define([
 
   Annotator.prototype._setMode = function (mode) {
     this.mode = mode;
+
+    $('#brush-size').addClass('hide');
+    $('#line-width').addClass('hide');
+
+    if (mode === 'brush') {
+      $('#brush-size').removeClass('hide');
+    } else if (mode === 'line') {
+      $('#line-width').removeClass('hide');
+    }
   };
 
   Annotator.prototype._updateHighlight = function (pixels) {

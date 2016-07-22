@@ -42,6 +42,23 @@ define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annot
     }, 1000);
   }
 
+  // Mousewheel event handler.
+  function createMousewheelScrollEvent() {
+    var onUpScroll = arguments.length <= 0 || arguments[0] === undefined ? function () {} : arguments[0];
+    var onDownScroll = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+    $(window).bind('DOMMouseScroll mousewheel', function (e) {
+      if (e.originalEvent.detail > 0 || e.originalEvent.wheelDelta < 0) {
+        onDownScroll();
+      } else {
+        onUpScroll();
+      }
+
+      // Prevent page fom scrolling.
+      return false;
+    });
+  }
+
   // Creates sliders.
   function createSlidersFromElements(annotator) {
     var pixelSizeSlider = $('.pixel-size-slider')[0];
@@ -89,10 +106,10 @@ define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annot
 
     // Brush size configuration.
     var brushSizeSliderConfig = {
-      min: 3,
+      min: 1,
       max: 50,
       step: 1,
-      value: 3
+      value: 25
     };
 
     // Line width configuration.
@@ -163,21 +180,27 @@ define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annot
 
     // Create zoom slider.
     createSlider(zoomSlider, zoomSliderConfig, function (value) {
-      currentZoomValue = value;
+      currentZoomValue = +value;
 
       zoomValue.text(value);
       annotator.zoom(value);
     }, function (setValue) {
+      function increaseZoom() {
+        setValue(currentZoomValue + zoomSliderConfig.step);
+      }
+
+      function decraseZoom() {
+        setValue(currentZoomValue - zoomSliderConfig.step);
+      }
+
+      createMousewheelScrollEvent(increaseZoom, decraseZoom);
+
       Mousetrap.bind(['z +'], function () {
-        if (currentZoomValue + zoomSliderConfig.step <= zoomSliderConfig.max) {
-          setValue(currentZoomValue + zoomSliderConfig.step);
-        }
+        increaseZoom();
       });
 
       Mousetrap.bind(['z -'], function () {
-        if (currentZoomValue - zoomSliderConfig.step >= zoomSliderConfig.min) {
-          setValue(currentZoomValue - zoomSliderConfig.step);
-        }
+        decraseZoom();
       });
     });
 
@@ -226,6 +249,10 @@ define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annot
         annotator.show('image');
       }
     });
+
+    // Hide currenlty unnececarry sliders.
+    $('#brush-size').addClass('hide');
+    $('#line-width').addClass('hide');
   }
 
   // Add percentage filled information.
