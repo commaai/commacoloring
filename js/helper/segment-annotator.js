@@ -353,7 +353,6 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
   };
 
   // Private methods.
-
   Annotator.prototype._createLayers = function (options) {
     var onload = options.onload;
     delete options.onload;
@@ -482,6 +481,10 @@ define(['../image/layer', '../image/segmentation', '../image/morph'], function (
             annotator.onrightclick.call(annotator, existingLabel);
           }
         } else {
+          if (annotator.mode !== 'polygon') {
+            annotator._emptyPolygonPoints(); // Reset
+          }
+
           if (annotator.mode === "brush" && event.button === 0) {
             annotator.brush(annotator._getClickPos(event), annotator.currentLabel);
           } else if (annotator.mode === 'line' && event.button === 0) {
