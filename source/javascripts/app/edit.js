@@ -112,7 +112,7 @@ define([
 
     // Line width configuration.
     const lineWidthSliderConfig = {
-      min: 3,
+      min: 1,
       max: 50,
       step: 1,
       value: 3
@@ -476,10 +476,21 @@ define([
     const id = parseInt(params.id, 10);
 
     // Replace with /sample
-    $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function(json) {
+    $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function (json) {
+      let width = Math.abs($(window).width() - 350); // 350 - aside width
+      let height = Math.abs($(window).height());
+
+      if (width <= 960) {
+        width = 960;
+      }
+
+      if (height <= 720) {
+        height = 720;
+      }
+
       var annotator = new Annotator(json.data, {
-        width: params.width,
-        height: params.height,
+        width: width,
+        height: height,
         colormap: data.colormap,
         superpixelOptions: {
           method: 'slic',

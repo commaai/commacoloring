@@ -114,7 +114,7 @@ define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annot
 
     // Line width configuration.
     var lineWidthSliderConfig = {
-      min: 3,
+      min: 1,
       max: 50,
       step: 1,
       value: 3
@@ -473,9 +473,20 @@ define(['../image/layer', '../helper/segment-annotator'], function (Layer, Annot
 
     // Replace with /sample
     $.getJSON("http://cors.io/?u=https://commacoloring.herokuapp.com/sample", function (json) {
+      var width = Math.abs($(window).width() - 350); // 350 - aside width
+      var height = Math.abs($(window).height());
+
+      if (width <= 960) {
+        width = 960;
+      }
+
+      if (height <= 720) {
+        height = 720;
+      }
+
       var annotator = new Annotator(json.data, {
-        width: params.width,
-        height: params.height,
+        width: width,
+        height: height,
         colormap: data.colormap,
         superpixelOptions: {
           method: 'slic',

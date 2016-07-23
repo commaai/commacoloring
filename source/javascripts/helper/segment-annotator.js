@@ -53,8 +53,6 @@ define([
     this.prevAnnotationImg = null;
     this.lineToolActive = false;
 
-    console.log(options);
-
     this.layers.image.load(imageURL, {
       width: options.width,
       height: options.height,
@@ -395,17 +393,15 @@ define([
     this.height = options.height || this.layers.image.canvas.height;
 
     for (var key in this.layers) {
-      if (key !== "image") {
-        var canvas = this.layers[key].canvas;
-        canvas.width = this.width;
-        canvas.height = this.height;
-      }
+      var canvas = this.layers[key].canvas;
+      canvas.width = this.width;
+      canvas.height = this.height;
     }
 
-    this.innerContainer.style.width = this.width + "px";
-    this.innerContainer.style.height = this.height + "px";
-    this.container.style.width = this.width + "px";
-    this.container.style.height = this.height + "px";
+    this.innerContainer.style.width = `${this.width}px`;
+    this.innerContainer.style.height = `${this.height}px`;
+    this.container.style.width = `${this.width}px`;
+    this.container.style.height = `${this.height}px`;
   };
 
   Annotator.prototype._initializeHistory = function () {
@@ -461,18 +457,28 @@ define([
 
       if (mousestate.down) {
         if (mousestate.button === 2) {
-          if (annotator.mode === "polygon") {
-            annotator._emptyPolygonPoints(); //reset
-          } else if (annotator.mode === 'superpixel') {
-            isRightClickEraseModeActive = true;
+          switch (annotator.mode) {
+            case 'polygon':
+              annotator._emptyPolygonPoints(); //reset
+              break;
 
-            if (previousLabel !== annotator.currentLabel && annotator.currentLabel !== 0) {
-              previousLabel = annotator.currentLabel;
-            }
+            case 'superpixel':
+            case 'line':
+            case 'brush':
+              isRightClickEraseModeActive = true;
 
-            existingLabel = 0;
+              if (previousLabel !== annotator.currentLabel && annotator.currentLabel !== 0) {
+                previousLabel = annotator.currentLabel;
+              }
 
-            annotator._updateAnnotation(pixels, existingLabel);
+              existingLabel = 0;
+
+              annotator._updateAnnotation(pixels, existingLabel);
+
+              break;
+
+            default:
+              break;
           }
 
           if (typeof annotator.onrightclick === 'function') {
@@ -509,6 +515,7 @@ define([
       }
     }
 
+    canvas.addEventListener('mouseup', updateIfActive);
     canvas.addEventListener('mousemove', updateIfActive);
     canvas.addEventListener('mouseleave', function () {
       annotator._updateHighlight(null);
@@ -614,6 +621,7 @@ define([
     const ctx = canvas.getContext('2d');
     const pos = this._getClickPos(event);
     const [ x, y ] = pos;
+    const color = annotator.colormap[annotator.currentLabel];
 
     if (!this.lineToolActive) {
       ctx.save();
@@ -622,7 +630,8 @@ define([
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.strokeStyle = 'rgba(0, 0, 0, 255)';
+    ctx.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 255)`;
+
     ctx.lineWidth = this.lineWidth;
 
     ctx.beginPath();
@@ -807,6 +816,7 @@ define([
   Annotator.prototype._setMode = function (mode) {
     this.mode = mode;
 
+    $('#superpixel-size').addClass('hide');
     $('#brush-size').addClass('hide');
     $('#line-width').addClass('hide');
 
@@ -814,6 +824,8 @@ define([
       $('#brush-size').removeClass('hide');
     } else if (mode === 'line') {
       $('#line-width').removeClass('hide');
+    } else if (mode === 'superpixel') {
+      $('#superpixel-size').removeClass('hide');
     }
   };
 
