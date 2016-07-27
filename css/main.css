@@ -254,12 +254,11 @@ body {
   background-color: #ffffff;
   border: 1px solid black;
 }
-.suggest-button {
+.button {
   position: relative;
   top: -28px;
   margin-left: 8px;
   width: 62px;
   height: 62px;
-
 }
 
