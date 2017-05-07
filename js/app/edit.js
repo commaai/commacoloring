@@ -345,6 +345,9 @@ function(Layer, Annotator, util) {
             onload: function () {
               if (data.annotationURLs)
                 annotator.import(data.annotationURLs[id]);
+              $.getJSON("/suggestion/"+json.name, function(json2) {
+                annotator.setFromURL(json2.data);
+              });
               annotator.hide("boundary");
               boundaryFlash();
             },
@@ -365,13 +368,6 @@ function(Layer, Annotator, util) {
             onmousemove: highlightLabel
           });
       annotator.imageName = json.name;
-      $(".suggest-button").click(function() {
-        if (confirm('Caution, this will replace your work with a suggestion. Okay? If you just submit the suggestion, you will not get comma points.')) {
-          $.getJSON("/suggestion/"+json.name, function(json2) {
-            annotator.setFromURL(json2.data);
-          });
-        }
-      });
       document.body.appendChild(createMainDisplay(params, data, annotator));
     });
   }
