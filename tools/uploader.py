@@ -2,8 +2,8 @@
 from db import conn
 import os, sys, json, base64
 
-TABLE = 'data'
-#TABLE = 'suggestions'
+#TABLE = 'data'
+TABLE = 'suggestions'
 
 if __name__ == "__main__":
   for f in sys.argv[1:]:
